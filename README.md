@@ -12,7 +12,7 @@ master | develop
 
 ## Prerequriments
 
-* Net Core 2.2.301
+* Net Core 3
 * PostgreSQL
 
 ## Configuration
