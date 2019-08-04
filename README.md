@@ -1,31 +1,46 @@
-# ITLab.Projects
+# Projects service for RTUITLab
 
-A [Giraffe](https://github.com/giraffe-fsharp/Giraffe) web application, which has been created via the `dotnet new giraffe` command.
+## Prerequriments
 
-## Build and test the application
+* Net Core 2.2.301
+* PostgreSQL
 
-### Windows
+## Configuration
 
-Run the `build.bat` script in order to restore, build and test (if you've selected to include tests) the application:
+### Database project
 
-```
-> ./build.bat
-```
+```appsettings.Secret.json``` must be placed to the ```src/ITLab.Projects.Database/``` folder
 
-### Linux/macOS
-
-Run the `build.sh` script in order to restore, build and test (if you've selected to include tests) the application:
-
-```
-$ ./build.sh
-```
-
-## Run the application
-
-After a successful build you can start the web application by executing the following command in your terminal:
-
-```
-dotnet run src/ITLab.Projects
+```json
+{
+    "ConnectionStrings": {
+        "Postgres": "CONNECTION STRING"
+    }
+}
 ```
 
-After the application has started visit [http://localhost:5000](http://localhost:5000) in your preferred browser.
+### Main project
+
+```appsettings.Secret.json``` must be placed to the ```src/ITLab.Projects/``` folder
+
+
+```json
+{
+    "DB_TYPE": "TYPE",
+    "ConnectionStrings": {
+        "Postgres": "CONNECTION STRING"
+    }
+}
+```
+
+**DB_TYPE** - type of the database which will be used. Can be:
+
+* **IN_MEMORY** - use in memory database, use for debug or first start
+* **POSTGRES** - use PostgreSQL database with connection string from ```ConnectionStrings:Postgres```
+
+## Run
+```bash
+cd ./src/ITLab.Projects
+dotnet run
+```
+API will be available on [localhost:54052](http://localhost:54052)
