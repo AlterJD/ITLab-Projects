@@ -15,12 +15,18 @@ steps:
       command: restore
       arguments: --source https://api.nuget.org/v3/index.json
 
+  - task: file-creator@5
+    inputs:
+      filepath: 'src/ITLab.Projects/appsettings.Secret.json'
+      filecontent: '{}'
+      endWithNewLine: true
+
   - task: DotNetCoreCLI@2
     displayName: dotnet publish
     inputs:
       command: publish
       publishWebProjects: false
-      projects: src/ITLab.Projects/ITLab.Projects.fsproj
+      projects: 
       arguments: -o $(Build.ArtifactStagingDirectory) --no-restore
       zipAfterPublish: false
       modifyOutputPath: false
