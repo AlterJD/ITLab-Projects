@@ -338,3 +338,5 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/src/ITLab.Projects/appsettings.Secret.json
+/src/ITLab.Projects.Database/appsettings.Secret.json
