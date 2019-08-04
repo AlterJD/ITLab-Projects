@@ -22,6 +22,12 @@ steps:
       endWithNewLine: true
 
   - task: DotNetCoreCLI@2
+    displayName: dotnet test
+    inputs:
+      command: test
+      projects: 'tests/**/*.fsproj'
+
+  - task: DotNetCoreCLI@2
     displayName: dotnet publish
     inputs:
       command: publish
