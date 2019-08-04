@@ -25,7 +25,8 @@ steps:
     displayName: dotnet test
     inputs:
       command: test
-      projects: 'tests/**/*.fsproj'
+      projects: tests/**/*.fsproj
+      arguments: --no-restore
 
   - task: DotNetCoreCLI@2
     displayName: dotnet publish
