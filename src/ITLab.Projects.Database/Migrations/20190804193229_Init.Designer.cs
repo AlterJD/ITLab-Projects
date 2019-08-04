@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ITLab.Projects.Database.Migrations
 {
     [DbContext(typeof(ProjectsContext))]
-    [Migration("20190804162543_Init")]
+    [Migration("20190804193229_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,11 +58,14 @@ namespace ITLab.Projects.Database.Migrations
 
                     b.Property<string>("LogoLink");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<string>("TasksLink");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name");
 
                     b.ToTable("Projects");
                 });
@@ -74,9 +77,12 @@ namespace ITLab.Projects.Database.Migrations
 
                     b.Property<string>("Description");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name");
 
                     b.ToTable("ProjectRoles");
                 });
@@ -99,9 +105,12 @@ namespace ITLab.Projects.Database.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Value");
+                    b.Property<string>("Value")
+                        .IsRequired();
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Value");
 
                     b.ToTable("Tags");
                 });

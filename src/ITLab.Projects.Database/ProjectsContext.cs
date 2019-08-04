@@ -21,6 +21,27 @@ namespace ITLab.Projects.Database
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<Project>(b =>
+            {
+                b.HasIndex(p => p.Name);
+                b.Property(p => p.Name)
+                    .IsRequired(true);
+            });
+
+            builder.Entity<Tag>(b =>
+            {
+                b.HasIndex(t => t.Value);
+                b.Property(t => t.Value)
+                    .IsRequired(true);
+            });
+
+            builder.Entity<ProjectRole>(b =>
+            {
+                b.HasIndex(pr => pr.Name);
+                b.Property(pr => pr.Name)
+                    .IsRequired(true);
+            });
+
             builder.Entity<ProjectTag>(b =>
             {
                 b.HasKey(pt => new { pt.ProjectId, pt.TagId });

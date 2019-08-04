@@ -14,7 +14,7 @@ namespace ITLab.Projects.Database.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None),
                     Description = table.Column<string>(nullable: true)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None)
@@ -30,7 +30,7 @@ namespace ITLab.Projects.Database.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None),
                     Description = table.Column<string>(nullable: true)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None),
@@ -54,7 +54,7 @@ namespace ITLab.Projects.Database.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None),
-                    Value = table.Column<string>(nullable: true)
+                    Value = table.Column<string>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None)
                 },
                 constraints: table =>
@@ -133,9 +133,24 @@ namespace ITLab.Projects.Database.Migrations
                 column: "ProjectRoleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProjectRoles_Name",
+                table: "ProjectRoles",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_Name",
+                table: "Projects",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProjectTags_TagId",
                 table: "ProjectTags",
                 column: "TagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tags_Value",
+                table: "Tags",
+                column: "Value");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
