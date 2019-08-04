@@ -8,13 +8,20 @@ pool:
   name: Default
 
 steps:
+
+  - task: DotNetCoreCLI@2
+    displayName: dotnet restore
+    inputs:
+      command: restore
+      arguments: --source https://api.nuget.org/v3/index.json
+
   - task: DotNetCoreCLI@2
     displayName: dotnet publish
     inputs:
       command: publish
       publishWebProjects: false
       projects: src/ITLab.Projects/ITLab.Projects.fsproj
-      arguments: -o $(Build.ArtifactStagingDirectory)
+      arguments: -o $(Build.ArtifactStagingDirectory) --no-restore
       zipAfterPublish: false
       modifyOutputPath: false
 
