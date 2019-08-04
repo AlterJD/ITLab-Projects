@@ -9,16 +9,23 @@ open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.TestHost
 open Microsoft.Extensions.DependencyInjection
+open Microsoft.Extensions.Configuration
 
 // ---------------------------------
 // Helper functions (extend as you need)
 // ---------------------------------
 
 let createHost() =
+    let configuration = 
+        (new ConfigurationBuilder())
+            .AddInMemoryCollection(
+                dict["DB_TYPE","IN_MEMORY"]
+            )
+            .Build()
     WebHostBuilder()
         .UseContentRoot(Directory.GetCurrentDirectory())
         .Configure(Action<IApplicationBuilder> ITLab.Projects.App.configureApp)
-        .ConfigureServices(Action<IServiceCollection> ITLab.Projects.App.configureServices)
+        .ConfigureServices(Action<IServiceCollection> (ITLab.Projects.App.configureServices configuration))
 
 let runTask task =
     task
@@ -54,15 +61,15 @@ let shouldContain (expected : string) (actual : string) =
 // ---------------------------------
 
 [<Fact>]
-let ``Route /api/hello returns "Hello world, from Giraffe!"`` () =
+let ``Route /api/projects returns empty array`` () =
     use server = new TestServer(createHost())
     use client = server.CreateClient()
 
     client
-    |> httpGet "/api/hello"
+    |> httpGet "/api/projects"
     |> ensureSuccess
     |> readText
-    |> shouldContain "Hello world, from Giraffe!"
+    |> shouldContain "[]"
 
 [<Fact>]
 let ``Route which doesn't exist returns 404 Page not found`` () =
@@ -72,5 +79,3 @@ let ``Route which doesn't exist returns 404 Page not found`` () =
     client
     |> httpGet "/route/which/does/not/exist"
     |> isStatus HttpStatusCode.NotFound
-    |> readText
-    |> shouldEqual "Not Found"
