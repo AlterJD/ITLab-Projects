@@ -2,7 +2,7 @@
 
 master | develop | tests
 --- | --- | ---
-[![Build Status][build-master-image]][build-master-link] | [![Build Status][build-dev-image]][build-dev-link] | ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/RTUITLab/RTU%20IT%20Lab/66?label=%20)
+[![Build Status][build-master-image]][build-master-link] | [![Build Status][build-dev-image]][build-dev-link] | ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/RTUITLab/RTU%20IT%20Lab/66?label=%20&style=plastic)
 
 
 [build-master-image]: https://dev.azure.com/rtuitlab/RTU%20IT%20Lab/_apis/build/status/ITLab-Projects?branchName=master
