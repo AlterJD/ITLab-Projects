@@ -43,10 +43,10 @@ master | develop
 }
 ```
 
-**DB_TYPE** - type of the database which will be used. Can be:
+**DB_TYPE** - type of the database which will be used. Possible types:
 
-* **IN_MEMORY** - use in memory database, use for debug or first start
-* **POSTGRES** - use PostgreSQL database with connection string from ```ConnectionStrings:Postgres```
+* **IN_MEMORY** - to use in memory database for debug or first start
+* **POSTGRES** - to use PostgreSQL database with connection string from ```ConnectionStrings:Postgres```
 
 ## Run
 ```bash
@@ -54,3 +54,5 @@ cd ./src/ITLab.Projects
 dotnet run
 ```
 API will be available on [localhost:54052](http://localhost:54052)
+
+<!-- TODO: run tests -->
