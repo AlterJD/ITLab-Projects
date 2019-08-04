@@ -45,12 +45,9 @@ let configureCors (builder : CorsPolicyBuilder) =
            |> ignore
 
 let configureApp (app : IApplicationBuilder) =
-    let env = app.ApplicationServices.GetService<IHostingEnvironment>()
-    (match env.IsDevelopment() with
-    | true  -> app.UseDeveloperExceptionPage()
-    | false -> app.UseGiraffeErrorHandler errorHandler)
-        .UseCors(configureCors)
-        .UseGiraffe(webApp)
+    app.UseGiraffeErrorHandler(errorHandler)
+       .UseCors(configureCors)
+       .UseGiraffe(webApp)
 
 type CustomNegotiationConfig (baseConfig : INegotiationConfig) =
     let plainText x = text (x.ToString())
