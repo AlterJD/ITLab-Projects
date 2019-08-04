@@ -1,5 +1,15 @@
 # Projects service for RTUITLab
 
+master | develop
+--- | ---
+[![Build Status][build-master-image]][build-master-link] | [![Build Status][build-dev-image]][build-dev-link]
+
+
+[build-master-image]: https://dev.azure.com/rtuitlab/RTU%20IT%20Lab/_apis/build/status/ITLab-Projects?branchName=master
+[build-master-link]: https://dev.azure.com/rtuitlab/RTU%20IT%20Lab/_build/latest?definitionId=66&branchName=master
+[build-dev-image]: https://dev.azure.com/rtuitlab/RTU%20IT%20Lab/_apis/build/status/ITLab-Projects?branchName=develop
+[build-dev-link]: https://dev.azure.com/rtuitlab/RTU%20IT%20Lab/_build/latest?definitionId=66&branchName=develop
+
 ## Prerequriments
 
 * Net Core 2.2.301
