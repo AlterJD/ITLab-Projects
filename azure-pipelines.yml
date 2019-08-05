@@ -21,6 +21,12 @@ steps:
       filecontent: '{}'
       endWithNewLine: true
 
+  - task: file-creator@5
+    inputs:
+      filepath: 'src/ITLab.Projects.Database/appsettings.Secret.json'
+      filecontent: '{}'
+      endWithNewLine: true
+
   - task: DotNetCoreCLI@2
     displayName: dotnet test
     inputs:
@@ -49,6 +55,7 @@ steps:
       Contents: '**'
 
   - task: CopyFiles@2
+    displayName: 'copy develop artifact'
     inputs:
       SourceFolder: 'deploy/develop'
       Contents: '**'
@@ -61,6 +68,7 @@ steps:
       ArtifactName: 'itlab-projects-deploy-$(Build.SourceBranchName)'
 
   - task: CopyFiles@2
+    displayName: 'copy master artifact'
     inputs:
       SourceFolder: 'deploy/master'
       Contents: '**'
