@@ -55,22 +55,9 @@ steps:
       Contents: '**'
 
   - task: CopyFiles@2
-    displayName: 'copy develop artifact'
+    displayName: 'copy $(Build.SourceBranchName) artifact'
     inputs:
-      SourceFolder: 'deploy/develop'
-      Contents: '**'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-      CleanTargetFolder: true
-
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: itlab-projects-deploy-$(Build.SourceBranchName)'
-    inputs:
-      ArtifactName: 'itlab-projects-deploy-$(Build.SourceBranchName)'
-
-  - task: CopyFiles@2
-    displayName: 'copy master artifact'
-    inputs:
-      SourceFolder: 'deploy/master'
+      SourceFolder: 'deploy/$(Build.SourceBranchName)'
       Contents: '**'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
       CleanTargetFolder: true
