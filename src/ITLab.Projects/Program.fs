@@ -16,6 +16,7 @@ open Microsoft.AspNetCore.Http.Features
 open Microsoft.AspNetCore.Http
 open Giraffe.Serialization
 open Newtonsoft.Json
+open Newtonsoft.Json.Serialization
 
 // ---------------------------------
 // Web app
@@ -35,6 +36,7 @@ let webApp =
                 choose [
                     GET >=> allprojects
                     POST >=> allowSynchronousIO >=> addProject
+                    DELETE >=> routef "/%O" removeProject
                 ]
             )
         ]
@@ -98,7 +100,8 @@ let configureServices (configuration: IConfiguration) (services : IServiceCollec
     services.AddGiraffe() |> ignore
 
     let customSettings = JsonSerializerSettings(
-                            DateTimeZoneHandling = DateTimeZoneHandling.Utc
+                            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                            ContractResolver = CamelCasePropertyNamesContractResolver()
                             //, 
                             //NullValueHandling = NullValueHandling.Ignore
                             )

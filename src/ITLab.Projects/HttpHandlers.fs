@@ -16,6 +16,9 @@ module HttpHandlers =
         with :? FormatException -> 
             None
     
+    let wrapOption value =
+        if (box value = null) then None else Some(value)
+
     let getIntQueryValue (ctx : HttpContext) name defaultVal =
         ctx.TryGetQueryStringValue name
             |> Option.defaultValue "incorrect"
@@ -78,6 +81,25 @@ module HttpHandlers =
                     db.Projects.Add(project) |> ignore
                     let! save = db.SaveChangesAsync()
                     return! json project next ctx
+            }
+    
+    let removeProject (id: Guid) = 
+        fun (next: HttpFunc) (ctx: HttpContext)->
+            let db = ctx.GetService<ProjectsContext>()
+            task {
+                let existing = query {
+                    for project in db.Projects do
+                        where (project.Id = id)
+                        select project
+                        exactlyOneOrDefault
+                }
+                match wrapOption existing with
+                | None ->
+                    return! RequestErrors.NOT_FOUND "no project" next ctx
+                | Some finded ->
+                    db.Projects.Remove(finded) |> ignore
+                    let! save = db.SaveChangesAsync()
+                    return! json id next ctx
             }
 
             
