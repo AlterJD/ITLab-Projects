@@ -10,12 +10,38 @@ module HttpHandlers =
     open Giraffe
     open ITLab.Projects.Models
 
+    let tryParseInt s = 
+        try 
+            s |> int |> Some
+        with :? FormatException -> 
+            None
+    
+    let getIntQueryValue (ctx : HttpContext) name defaultVal =
+        ctx.TryGetQueryStringValue name
+            |> Option.defaultValue "incorrect"
+            |> tryParseInt
+            |> Option.defaultValue defaultVal
+
     let allprojects =
         fun (next : HttpFunc) (ctx : HttpContext) ->
+            let limit = getIntQueryValue ctx "limit" 0
+            let start = getIntQueryValue ctx "start" 0
+
             let db = ctx.GetService<ProjectsContext>()
+
+            query {
+                for project in db.Projects do
+                select project
+                count
+            }
+            |> ctx.SetHttpHeader "x-total-count" |> ignore
+
             task {
                 let projects = query {
                     for project in db.Projects do
+                        sortBy project.Name
+                        skip start
+                        take limit
                         select project
                 }
                 return! json projects next ctx

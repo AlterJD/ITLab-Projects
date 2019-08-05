@@ -97,7 +97,11 @@ let configureServices (configuration: IConfiguration) (services : IServiceCollec
     services.AddCors()    |> ignore
     services.AddGiraffe() |> ignore
 
-    let customSettings = JsonSerializerSettings(DateTimeZoneHandling = DateTimeZoneHandling.Utc)
+    let customSettings = JsonSerializerSettings(
+                            DateTimeZoneHandling = DateTimeZoneHandling.Utc
+                            //, 
+                            //NullValueHandling = NullValueHandling.Ignore
+                            )
 
     services.AddSingleton<IJsonSerializer>(
         NewtonsoftJsonSerializer(customSettings)) |> ignore
