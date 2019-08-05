@@ -47,3 +47,27 @@ steps:
     inputs:
       SourceFolder: '$(Build.ArtifactStagingDirectory)'
       Contents: '**'
+
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: 'deploy/develop'
+      Contents: '**'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      CleanTargetFolder: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: itlab-projects-deploy-$(Build.SourceBranchName)'
+    inputs:
+      ArtifactName: 'itlab-projects-deploy-$(Build.SourceBranchName)'
+
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: 'deploy/master'
+      Contents: '**'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      CleanTargetFolder: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: itlab-projects-deploy-$(Build.SourceBranchName)'
+    inputs:
+      ArtifactName: 'itlab-projects-deploy-$(Build.SourceBranchName)'
