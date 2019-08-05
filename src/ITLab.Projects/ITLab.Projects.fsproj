@@ -18,6 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="appsettings.example.postgres.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="appsettings.Secret.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -26,10 +29,9 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
 
-  <ItemGroup />
-
   <ItemGroup>
     <ProjectReference Include="..\ITLab.Projects.Database\ITLab.Projects.Database.csproj" />
+    <ProjectReference Include="..\ITLab.Projects.PublicAPI\ITLab.Projects.PublicAPI.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

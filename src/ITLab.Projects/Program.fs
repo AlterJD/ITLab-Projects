@@ -12,16 +12,32 @@ open ITLab.Projects.HttpHandlers
 open Microsoft.Extensions.Configuration
 open ITLab.Projects.Database
 open WebApp.Configure.Models;
+open Microsoft.AspNetCore.Http.Features
+open Microsoft.AspNetCore.Http
+open Giraffe.Serialization
+open Newtonsoft.Json
+open Newtonsoft.Json.Serialization
 
 // ---------------------------------
 // Web app
 // ---------------------------------
 
+
+let allowSynchronousIO  : HttpHandler =
+    fun (next : HttpFunc) (ctx : HttpContext) ->
+        ctx.Features.Get<IHttpBodyControlFeature>().AllowSynchronousIO <- true
+        next ctx
+
+
 let webApp =
     subRoute "/api" (
         choose [
             subRoute "/projects" (
-                GET >=> allprojects
+                choose [
+                    GET >=> allprojects
+                    POST >=> allowSynchronousIO >=> addProject
+                    DELETE >=> routef "/%O" removeProject
+                ]
             )
         ]
     )
@@ -82,6 +98,17 @@ let configureServices (configuration: IConfiguration) (services : IServiceCollec
     services.AddWebAppConfigure().AddTransientConfigure<MigrationApplyWork>() |> ignore
     services.AddCors()    |> ignore
     services.AddGiraffe() |> ignore
+
+    let customSettings = JsonSerializerSettings(
+                            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                            ContractResolver = CamelCasePropertyNamesContractResolver()
+                            //, 
+                            //NullValueHandling = NullValueHandling.Ignore
+                            )
+
+    services.AddSingleton<IJsonSerializer>(
+        NewtonsoftJsonSerializer(customSettings)) |> ignore
+
 
 let configureLogging (builder : ILoggingBuilder) =
     builder.AddFilter(fun l -> l.Equals LogLevel.Debug)
