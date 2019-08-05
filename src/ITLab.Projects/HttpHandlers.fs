@@ -27,7 +27,7 @@ module HttpHandlers =
 
     let allprojects =
         fun (next : HttpFunc) (ctx : HttpContext) ->
-            let limit = getIntQueryValue ctx "limit" 0
+            let limit = getIntQueryValue ctx "limit" 10
             let start = getIntQueryValue ctx "start" 0
 
             let db = ctx.GetService<ProjectsContext>()
