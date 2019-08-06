@@ -117,7 +117,7 @@ module TagsHttpHandlers =
 
                 let targetLink = query {
                     for pt in db.ProjectTags do
-                    where (pt.ProjectId = id & pt.Tag.Value = wantedTag)
+                    where (pt.ProjectId = id && pt.Tag.Value = wantedTag)
                     exactlyOneOrDefault
                 }
 
