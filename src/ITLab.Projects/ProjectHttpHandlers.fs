@@ -5,7 +5,7 @@ open ProjectResponses
 open System
 open System.Linq
 
-module HttpHandlers =
+module ProjectHttpHandlers =
 
     open Microsoft.AspNetCore.Http
     open FSharp.Control.Tasks.V2.ContextInsensitive

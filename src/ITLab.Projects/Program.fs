@@ -8,7 +8,7 @@ open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.EntityFrameworkCore
 open Giraffe
-open ITLab.Projects.HttpHandlers
+open ITLab.Projects.ProjectHttpHandlers
 open Microsoft.Extensions.Configuration
 open ITLab.Projects.Database
 open WebApp.Configure.Models;
@@ -17,6 +17,7 @@ open Microsoft.AspNetCore.Http
 open Giraffe.Serialization
 open Newtonsoft.Json
 open Newtonsoft.Json.Serialization
+open ITLab.Projects.TagsHttpHandlers
 
 // ---------------------------------
 // Web app
@@ -34,10 +35,18 @@ let webApp =
         choose [
             subRoute "/projects" (
                 choose [
-                    GET >=> routef "/%O" oneProject
+                    subRoute "/tags" allTags
+                    routef "/%O/tags" (fun id ->
+                        POST >=> allowSynchronousIO >=> addTagToProject id
+                    )
+                    routef "/%O" (fun id -> choose [
+                        GET >=> oneProject id
+                        DELETE >=> removeProject id
+                    ])
+                    
                     GET >=> allprojects
                     POST >=> allowSynchronousIO >=> addProject
-                    DELETE >=> routef "/%O" removeProject
+
                 ]
             )
         ]

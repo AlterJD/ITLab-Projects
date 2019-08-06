@@ -18,14 +18,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="TagsHttpHandlers.fs" />
+    <Compile Include="ProjectHttpHandlers.fs" />
     <Content Include="appsettings.example.postgres.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="appsettings.Secret.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Compile Include="Models.fs" />
-    <Compile Include="HttpHandlers.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
