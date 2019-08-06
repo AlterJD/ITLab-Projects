@@ -34,6 +34,7 @@ let webApp =
         choose [
             subRoute "/projects" (
                 choose [
+                    GET >=> routef "/%O" oneProject
                     GET >=> allprojects
                     POST >=> allowSynchronousIO >=> addProject
                     DELETE >=> routef "/%O" removeProject

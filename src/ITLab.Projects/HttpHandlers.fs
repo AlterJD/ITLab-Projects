@@ -3,6 +3,7 @@ namespace ITLab.Projects
 open ITLab.Projects.Database
 open ProjectResponses
 open System
+open System.Linq
 
 module HttpHandlers =
 
@@ -10,6 +11,8 @@ module HttpHandlers =
     open FSharp.Control.Tasks.V2.ContextInsensitive
     open Giraffe
     open ITLab.Projects.Models
+
+
 
     let tryParseInt s = 
         try 
@@ -54,6 +57,7 @@ module HttpHandlers =
                             GitRepoLink = project.GitRepoLink
                             TasksLink = project.TasksLink
                             LogoLink = project.LogoLink
+                            ProjectTags = project.ProjectTags.Select(fun pt -> pt.Tag.Value).ToList()
                         }
                 }
                 return! json projects next ctx
@@ -63,8 +67,33 @@ module HttpHandlers =
         fun (next: HttpFunc) (ctx: HttpContext) ->
             let db = ctx.GetService<ProjectsContext>()
             task {
-                let! finded = db.FindAsync(id)
-                return! text "" next ctx
+                let finded = query {
+                   for project in db.Projects do
+                      where (id = project.Id)
+                      select {
+                         Id = project.Id
+                         Name = project.Name
+                         ShortDescription = project.ShortDescription
+                         Description = project.Description
+                         CreateTime = project.CreateTime
+                         GitRepoLink = project.GitRepoLink
+                         TasksLink = project.TasksLink
+                         LogoLink = project.LogoLink
+                         Tags = project.ProjectTags.Select(fun pt -> pt.Tag.Value).ToList()
+                         Participations = project.Participations.Select(fun p -> {
+                            UserId = p.UserId
+                            RoleId = p.ProjectRoleId
+                            RoleName = p.ProjectRole.Name
+                         }).ToList()
+                      }
+                      exactlyOneOrDefault
+                }
+
+                match wrapOption finded with
+                | None ->
+                    return! RequestErrors.NOT_FOUND "no project" next ctx
+                | Some full ->
+                    return! json full next ctx
             }
 
     let addProject = 
