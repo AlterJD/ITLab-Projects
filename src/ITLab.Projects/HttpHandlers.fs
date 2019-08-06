@@ -1,6 +1,7 @@
 namespace ITLab.Projects
 
 open ITLab.Projects.Database
+open ProjectResponses
 open System
 
 module HttpHandlers =
@@ -45,11 +46,26 @@ module HttpHandlers =
                         sortBy project.Name
                         skip start
                         take limit
-                        select project
+                        select {
+                            Id = project.Id
+                            Name = project.Name
+                            ShortDescription = project.ShortDescription
+                            CreateTime = project.CreateTime
+                            GitRepoLink = project.GitRepoLink
+                            TasksLink = project.TasksLink
+                            LogoLink = project.LogoLink
+                        }
                 }
                 return! json projects next ctx
             }
-
+    
+    let oneProject (id: Guid) =
+        fun (next: HttpFunc) (ctx: HttpContext) ->
+            let db = ctx.GetService<ProjectsContext>()
+            task {
+                let! finded = db.FindAsync(id)
+                return! text "" next ctx
+            }
 
     let addProject = 
         fun (next : HttpFunc) (ctx : HttpContext) ->
@@ -69,6 +85,7 @@ module HttpHandlers =
                     let project = {
                         Id = Guid.NewGuid()
                         Name = model.Name
+                        ShortDescription = model.ShortDescription
                         Description = model.Description
                         CreateTime = DateTime.UtcNow
                         GitRepoLink = model.GitRepoLink

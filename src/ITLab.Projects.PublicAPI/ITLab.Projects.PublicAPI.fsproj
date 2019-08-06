@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Responses\ProjectResponses.fs" />
     <Compile Include="Requests\ProjectRequests.fs" />
   </ItemGroup>
 

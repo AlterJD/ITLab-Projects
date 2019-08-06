@@ -1,12 +1,12 @@
-﻿module ProjectRequests
+﻿module ProjectResponses
 
 open System
 
 [<CLIMutable>]
-type Create = {
+type Compact = {
+    Id: Guid
     Name: string
     ShortDescription: string
-    Description: string
     CreateTime: DateTime
     GitRepoLink: string
     TasksLink: string
