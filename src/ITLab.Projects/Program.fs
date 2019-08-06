@@ -31,26 +31,25 @@ let allowSynchronousIO  : HttpHandler =
 
 
 let webApp =
-    subRoute "/api" (
-        choose [
-            subRoute "/projects" (
-                choose [
-                    subRoute "/tags" allTags
-                    routef "/%O/tags" (fun id ->
-                        POST >=> allowSynchronousIO >=> addTagToProject id
-                    )
-                    routef "/%O" (fun id -> choose [
-                        GET >=> oneProject id
-                        DELETE >=> removeProject id
-                    ])
-                    
-                    GET >=> allprojects
-                    POST >=> allowSynchronousIO >=> addProject
+    subRoute "/api/projects" 
+        (choose [
+            subRoute "/tags" allTags
 
-                ]
-            )
-        ]
-    )
+            subRoutef "/%O" (fun (id:Guid) -> 
+                choose [
+                    subRoute "/tags" 
+                        (choose [
+                            POST >=> allowSynchronousIO >=> (addTagToProject id)
+                            DELETE >=> allowSynchronousIO >=> (removeTagFromProject id) ])
+
+                    subRoute "" 
+                        (choose [
+                            GET >=> (oneProject id)
+                            DELETE >=> (removeProject id) ]) ])
+            subRoute "" 
+                (choose [
+                    GET >=> allprojects
+                    POST >=> allowSynchronousIO >=> addProject ]) ])
 
 // ---------------------------------
 // Error handler

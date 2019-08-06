@@ -54,10 +54,6 @@ module TagsHttpHandlers =
                 return! json tags next ctx
             }
 
-    type ProjectSelecting = {
-        Id : Guid
-        Tags: ICollection<Tag>
-    }
     let addTagToProject (id: Guid) = 
         fun (next : HttpFunc) (ctx : HttpContext) ->
             let db = ctx.GetService<ProjectsContext>()
@@ -113,7 +109,25 @@ module TagsHttpHandlers =
                             let! saved = db.SaveChangesAsync()
                             return! json wantedTag next ctx
             }
- 
+    let removeTagFromProject (id: Guid) = 
+        fun (next : HttpFunc) (ctx : HttpContext) ->
+            let db = ctx.GetService<ProjectsContext>()
+            task {
+                let! wantedTag = ctx.BindJsonAsync<string>()
+
+                let targetLink = query {
+                    for pt in db.ProjectTags do
+                    where (pt.ProjectId = id & pt.Tag.Value = wantedTag)
+                    exactlyOneOrDefault
+                }
+
+                match wrapOption targetLink with
+                | None -> return! json wantedTag next ctx
+                | Some link ->
+                    db.ProjectTags.Remove(link) |> ignore
+                    let! saved = db.SaveChangesAsync()
+                    return! json wantedTag next ctx
+            }
             
 
       
