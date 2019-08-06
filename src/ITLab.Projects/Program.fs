@@ -8,7 +8,7 @@ open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.EntityFrameworkCore
 open Giraffe
-open ITLab.Projects.HttpHandlers
+open ITLab.Projects.ProjectHttpHandlers
 open Microsoft.Extensions.Configuration
 open ITLab.Projects.Database
 open WebApp.Configure.Models;
@@ -17,6 +17,7 @@ open Microsoft.AspNetCore.Http
 open Giraffe.Serialization
 open Newtonsoft.Json
 open Newtonsoft.Json.Serialization
+open ITLab.Projects.TagsHttpHandlers
 
 // ---------------------------------
 // Web app
@@ -30,17 +31,25 @@ let allowSynchronousIO  : HttpHandler =
 
 
 let webApp =
-    subRoute "/api" (
-        choose [
-            subRoute "/projects" (
+    subRoute "/api/projects" 
+        (choose [
+            subRoute "/tags" allTags
+
+            subRoutef "/%O" (fun (id:Guid) -> 
                 choose [
+                    subRoute "/tags" 
+                        (choose [
+                            POST >=> allowSynchronousIO >=> (addTagToProject id)
+                            DELETE >=> allowSynchronousIO >=> (removeTagFromProject id) ])
+
+                    subRoute "" 
+                        (choose [
+                            GET >=> (oneProject id)
+                            DELETE >=> (removeProject id) ]) ])
+            subRoute "" 
+                (choose [
                     GET >=> allprojects
-                    POST >=> allowSynchronousIO >=> addProject
-                    DELETE >=> routef "/%O" removeProject
-                ]
-            )
-        ]
-    )
+                    POST >=> allowSynchronousIO >=> addProject ]) ])
 
 // ---------------------------------
 // Error handler

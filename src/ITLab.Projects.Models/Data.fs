@@ -7,6 +7,7 @@ open System.Collections.Generic
 type Project = {
     Id: Guid
     Name: string
+    ShortDescription: string
     Description: string
     CreateTime: DateTime
     GitRepoLink: string
