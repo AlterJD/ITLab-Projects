@@ -18,6 +18,7 @@ open Giraffe.Serialization
 open Newtonsoft.Json
 open Newtonsoft.Json.Serialization
 open ITLab.Projects.TagsHttpHandlers
+open Microsoft.AspNetCore.Authentication.JwtBearer
 
 // ---------------------------------
 // Web app
@@ -26,12 +27,16 @@ open ITLab.Projects.TagsHttpHandlers
 
 let allowSynchronousIO  : HttpHandler =
     fun (next : HttpFunc) (ctx : HttpContext) ->
+        let logger = ctx.GetService<ILoggerFactory>().CreateLogger("routing")
+        logger.LogWarning "Allow Synchronous IO" |> ignore
         ctx.Features.Get<IHttpBodyControlFeature>().AllowSynchronousIO <- true
         next ctx
 
 
+let mustBeLoggedIn = requiresAuthentication (challenge "Bearer")
+        
 let webApp =
-    subRoute "/api/projects" 
+    mustBeLoggedIn >=> subRoute "/api/projects" 
         (choose [
             subRoute "/tags" allTags
 
@@ -73,6 +78,7 @@ let configureCors (builder : CorsPolicyBuilder) =
 let configureApp (app : IApplicationBuilder) =
     app.UseGiraffeErrorHandler(errorHandler)
        .UseCors(configureCors)
+       .UseAuthentication()
        .UseGiraffe(webApp)
 
 type CustomNegotiationConfig (baseConfig : INegotiationConfig) =
@@ -91,11 +97,15 @@ type CustomNegotiationConfig (baseConfig : INegotiationConfig) =
 
 exception InvalidDbType of string
 
+let configureJwt (configuration: IConfiguration) (options: JwtBearerOptions) =
+    options.Authority <- configuration.GetValue<string> "JWT:Authority"
+    options.RequireHttpsMetadata <- false
+    options.Audience <- "itlab.projects"
 
 let configureServices (configuration: IConfiguration) (services : IServiceCollection) =
-    match configuration.GetValue<string>("DB_TYPE") with
+    match configuration.GetValue<string> "DB_TYPE"  with
     | "POSTGRES" -> 
-        let connectionString = configuration.GetConnectionString("Postgres")
+        let connectionString = "Postgres" |> configuration.GetConnectionString
         services.AddDbContext<ProjectsContext>(fun o -> o.UseNpgsql connectionString |> ignore) |> ignore
     | "IN_MEMORY" -> 
         services.AddDbContext<ProjectsContext>(fun o -> o.UseInMemoryDatabase "In memory" |> ignore) |> ignore
@@ -118,10 +128,12 @@ let configureServices (configuration: IConfiguration) (services : IServiceCollec
 
     services.AddSingleton<IJsonSerializer>(
         NewtonsoftJsonSerializer(customSettings)) |> ignore
+    services.AddAuthentication("Bearer")
+        .AddJwtBearer("Bearer", Action<JwtBearerOptions> (configureJwt configuration) ) |> ignore
 
 
 let configureLogging (builder : ILoggingBuilder) =
-    builder.AddFilter(fun l -> l.Equals LogLevel.Debug)
+    builder.AddFilter(fun l -> l > LogLevel.Trace)
            .AddConsole()
            .AddDebug() |> ignore
 
