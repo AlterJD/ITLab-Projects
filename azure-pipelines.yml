@@ -21,6 +21,20 @@ steps:
       filecontent: '{}'
       endWithNewLine: true
 
+  - task: file-creator@5
+    inputs:
+      filepath: 'src/ITLab.Projects.Database/appsettings.Secret.json'
+      filecontent: '{}'
+      endWithNewLine: true
+
+
+  - task: DotNetCoreCLI@2
+    displayName: dotnet test
+    inputs:
+      command: test
+      projects: tests/**/*.fsproj
+      arguments: --no-restore
+
   - task: DotNetCoreCLI@2
     displayName: dotnet publish
     inputs:
@@ -40,3 +54,16 @@ steps:
     inputs:
       SourceFolder: '$(Build.ArtifactStagingDirectory)'
       Contents: '**'
+
+  - task: CopyFiles@2
+    displayName: 'copy $(Build.SourceBranchName) artifact'
+    inputs:
+      SourceFolder: 'deploy/$(Build.SourceBranchName)'
+      Contents: '**'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      CleanTargetFolder: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: itlab-projects-deploy-$(Build.SourceBranchName)'
+    inputs:
+      ArtifactName: 'itlab-projects-deploy-$(Build.SourceBranchName)'

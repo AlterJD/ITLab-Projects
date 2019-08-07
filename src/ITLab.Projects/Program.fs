@@ -8,23 +8,54 @@ open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.EntityFrameworkCore
 open Giraffe
-open ITLab.Projects.HttpHandlers
+open ITLab.Projects.ProjectHttpHandlers
 open Microsoft.Extensions.Configuration
 open ITLab.Projects.Database
 open WebApp.Configure.Models;
+open Microsoft.AspNetCore.Http.Features
+open Microsoft.AspNetCore.Http
+open Giraffe.Serialization
+open Newtonsoft.Json
+open Newtonsoft.Json.Serialization
+open ITLab.Projects.TagsHttpHandlers
+open Microsoft.AspNetCore.Authentication.JwtBearer
 
 // ---------------------------------
 // Web app
 // ---------------------------------
 
+
+let allowSynchronousIO  : HttpHandler =
+    fun (next : HttpFunc) (ctx : HttpContext) ->
+        let logger = ctx.GetService<ILoggerFactory>().CreateLogger("routing")
+        logger.LogWarning "Allow Synchronous IO" |> ignore
+        ctx.Features.Get<IHttpBodyControlFeature>().AllowSynchronousIO <- true
+        next ctx
+
+
+let mustBeLoggedIn = requiresAuthentication (challenge "Bearer")
+        
 let webApp =
-    subRoute "/api" (
-        choose [
-            subRoute "/projects" (
-                GET >=> allprojects
-            )
-        ]
-    )
+    mustBeLoggedIn >=> subRoute "/api/projects" 
+        (choose [
+            subRoute "/tags" allTags
+
+            subRoutef "/%O" (fun (id:Guid) -> 
+                choose [
+                    subRoute "/tags" 
+                        (choose [
+                            POST >=> allowSynchronousIO >=> (addTagToProject id)
+                            DELETE >=> allowSynchronousIO >=> (removeTagFromProject id) ])
+
+                    subRoute "" 
+                        (choose [
+                            GET >=> (oneProject id)
+                            PUT >=> allowSynchronousIO >=> (editProject id)
+                            DELETE >=> (removeProject id) ]) ])
+            subRoute "" 
+                (choose [
+                    GET >=> allprojects
+                    POST >=> allowSynchronousIO >=> addProject ]) ])
 
 // ---------------------------------
 // Error handler
@@ -45,12 +76,10 @@ let configureCors (builder : CorsPolicyBuilder) =
            |> ignore
 
 let configureApp (app : IApplicationBuilder) =
-    let env = app.ApplicationServices.GetService<IHostingEnvironment>()
-    (match env.IsDevelopment() with
-    | true  -> app.UseDeveloperExceptionPage()
-    | false -> app.UseGiraffeErrorHandler errorHandler)
-        .UseCors(configureCors)
-        .UseGiraffe(webApp)
+    app.UseGiraffeErrorHandler(errorHandler)
+       .UseCors(configureCors)
+       .UseAuthentication()
+       .UseGiraffe(webApp)
 
 type CustomNegotiationConfig (baseConfig : INegotiationConfig) =
     let plainText x = text (x.ToString())
@@ -68,11 +97,15 @@ type CustomNegotiationConfig (baseConfig : INegotiationConfig) =
 
 exception InvalidDbType of string
 
+let configureJwt (configuration: IConfiguration) (options: JwtBearerOptions) =
+    options.Authority <- configuration.GetValue<string> "JWT:Authority"
+    options.RequireHttpsMetadata <- false
+    options.Audience <- "itlab.projects"
 
 let configureServices (configuration: IConfiguration) (services : IServiceCollection) =
-    match configuration.GetValue<string>("DB_TYPE") with
+    match configuration.GetValue<string> "DB_TYPE"  with
     | "POSTGRES" -> 
-        let connectionString = configuration.GetConnectionString("Postgres")
+        let connectionString = "Postgres" |> configuration.GetConnectionString
         services.AddDbContext<ProjectsContext>(fun o -> o.UseNpgsql connectionString |> ignore) |> ignore
     | "IN_MEMORY" -> 
         services.AddDbContext<ProjectsContext>(fun o -> o.UseInMemoryDatabase "In memory" |> ignore) |> ignore
@@ -86,8 +119,21 @@ let configureServices (configuration: IConfiguration) (services : IServiceCollec
     services.AddCors()    |> ignore
     services.AddGiraffe() |> ignore
 
+    let customSettings = JsonSerializerSettings(
+                            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                            ContractResolver = CamelCasePropertyNamesContractResolver()
+                            //, 
+                            //NullValueHandling = NullValueHandling.Ignore
+                            )
+
+    services.AddSingleton<IJsonSerializer>(
+        NewtonsoftJsonSerializer(customSettings)) |> ignore
+    services.AddAuthentication("Bearer")
+        .AddJwtBearer("Bearer", Action<JwtBearerOptions> (configureJwt configuration) ) |> ignore
+
+
 let configureLogging (builder : ILoggingBuilder) =
-    builder.AddFilter(fun l -> l.Equals LogLevel.Debug)
+    builder.AddFilter(fun l -> l > LogLevel.Trace)
            .AddConsole()
            .AddDebug() |> ignore
 
