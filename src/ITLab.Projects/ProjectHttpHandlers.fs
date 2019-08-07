@@ -4,6 +4,7 @@ open ITLab.Projects.Database
 open ProjectResponses
 open System
 open System.Linq
+open Microsoft.EntityFrameworkCore
 
 module ProjectHttpHandlers =
 
@@ -11,6 +12,7 @@ module ProjectHttpHandlers =
     open FSharp.Control.Tasks.V2.ContextInsensitive
     open Giraffe
     open ITLab.Projects.Models
+
 
 
 
@@ -22,6 +24,9 @@ module ProjectHttpHandlers =
     
     let wrapOption value =
         if (box value = null) then None else Some(value)
+    
+    let firstOrSecond first second =
+        if (box first = null) then second else first
 
     let getIntQueryValue (ctx : HttpContext) name defaultVal =
         ctx.TryGetQueryStringValue name
@@ -100,7 +105,7 @@ module ProjectHttpHandlers =
         fun (next : HttpFunc) (ctx : HttpContext) ->
             let db = ctx.GetService<ProjectsContext>()
             task {
-                let! model = ctx.BindJsonAsync<ProjectRequests.Create>()
+                let! model = ctx.BindJsonAsync<ProjectRequests.CreateEdit>()
 
                 let existing = query {
                     for project in db.Projects do
@@ -129,6 +134,31 @@ module ProjectHttpHandlers =
                     return! json project next ctx
             }
     
+    let editProject (id: Guid) =
+        fun (next : HttpFunc) (ctx: HttpContext) ->
+            let db = ctx.GetService<ProjectsContext>()
+            task {
+                let! model = ctx.BindJsonAsync<ProjectRequests.CreateEdit>()
+                let! project = db.Projects.FindAsync(id);
+                match wrapOption project with
+                | None ->
+                    return! RequestErrors.BAD_REQUEST "project not found" next ctx
+                | Some project ->
+                    let updated = { project with 
+                                        Name = firstOrSecond model.Name project.Name
+                                        ShortDescription = firstOrSecond model.ShortDescription project.ShortDescription
+                                        Description = firstOrSecond model.Description project.Description
+                                        GitRepoLink = firstOrSecond model.GitRepoLink project.GitRepoLink
+                                        TasksLink = firstOrSecond model.TasksLink project.TasksLink
+                                        LogoLink = firstOrSecond model.LogoLink project.LogoLink 
+                    }
+                    db.Entry(project).State <- EntityState.Detached
+                    db.Update(updated) |> ignore
+                    let! saved = db.SaveChangesAsync()
+                    return! json updated next ctx
+                
+            }
+
     let removeProject (id: Guid) = 
         fun (next: HttpFunc) (ctx: HttpContext)->
             let db = ctx.GetService<ProjectsContext>()

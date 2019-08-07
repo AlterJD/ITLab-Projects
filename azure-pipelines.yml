@@ -27,13 +27,13 @@ steps:
       filecontent: '{}'
       endWithNewLine: true
 
-  # while net core 3 in memory throws exception
-  # - task: DotNetCoreCLI@2
-  #   displayName: dotnet test
-  #   inputs:
-  #     command: test
-  #     projects: tests/**/*.fsproj
-  #     arguments: --no-restore
+
+  - task: DotNetCoreCLI@2
+    displayName: dotnet test
+    inputs:
+      command: test
+      projects: tests/**/*.fsproj
+      arguments: --no-restore
 
   - task: DotNetCoreCLI@2
     displayName: dotnet publish

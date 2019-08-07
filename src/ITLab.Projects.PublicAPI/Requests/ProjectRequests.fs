@@ -3,7 +3,7 @@
 open System
 
 [<CLIMutable>]
-type Create = {
+type CreateEdit = {
     Name: string
     ShortDescription: string
     Description: string

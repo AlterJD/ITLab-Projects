@@ -45,6 +45,7 @@ let webApp =
                     subRoute "" 
                         (choose [
                             GET >=> (oneProject id)
+                            PUT >=> allowSynchronousIO >=> (editProject id)
                             DELETE >=> (removeProject id) ]) ])
             subRoute "" 
                 (choose [
