@@ -33,6 +33,6 @@ type Full = {
     GitRepoLink: string
     TasksLink: string
     LogoLink: string
-    Tags: ICollection<TagResponses.Full>
+    Tags: ICollection<TagResponses.ProjectView>
     Participations: ICollection<Participation>
 }

@@ -12,6 +12,16 @@ type Compact = {
 }
 
 [<CLIMutable>]
+type ProjectView = {
+    Id: Guid
+    Value: string
+    /// <summary>
+    /// Tag color in HEX format
+    ///</summary>
+    Color: string
+}
+
+[<CLIMutable>]
 type Full = {
     Id: Guid
     Value: string
@@ -19,4 +29,5 @@ type Full = {
     /// Tag color in HEX format
     ///</summary>
     Color: string
+    UseCount: int
 }

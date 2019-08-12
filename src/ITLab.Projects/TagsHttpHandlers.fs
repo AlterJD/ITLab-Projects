@@ -43,6 +43,7 @@ module TagsHttpHandlers =
                             TagResponses.Full.Id = tag.Id
                             TagResponses.Full.Value = tag.Value
                             TagResponses.Full.Color = tag.Color
+                            TagResponses.Full.UseCount = tag.ProjectTags.Count
                         }
                 }
                 return! json tags next ctx
@@ -98,6 +99,28 @@ module TagsHttpHandlers =
                             return! json newTag next ctx
                 }
 
+    let removeTag (tagId: Guid) =
+        fun (next: HttpFunc) (ctx: HttpContext) ->
+            let db = ctx.GetService<ProjectsContext>()
+            task {
+                let targetTag = query {
+                    for tag in db.Tags.Include(fun t -> t.ProjectTags) do
+                        where (tag.Id = tagId)
+                        select tag
+                        exactlyOneOrDefault
+                }
+                match wrapOption targetTag with
+                | None -> return! RequestErrors.NOT_FOUND "no tag" next ctx
+                | Some tag ->
+                    match targetTag.ProjectTags.Count with
+                    | count when count > 0 -> 
+                        return! RequestErrors.BAD_REQUEST "tag uses in project" next ctx
+                    | _ ->
+                        db.Tags.Remove(tag) |> ignore
+                        let! saved = db.SaveChangesAsync()
+                        return! json tagId next ctx
+            }
+            
 
     let addTagToProject (projectId: Guid) (tagId: Guid) = 
         fun (next : HttpFunc) (ctx : HttpContext) ->
