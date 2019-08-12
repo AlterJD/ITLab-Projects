@@ -33,6 +33,11 @@ namespace ITLab.Projects.Database
                 b.HasIndex(t => t.Value);
                 b.Property(t => t.Value)
                     .IsRequired(true);
+                b.Property(t => t.Color)
+                    .IsRequired(true);
+                b.Property(t => t.Color
+                )
+                    .HasDefaultValue("#ffffff");
             });
 
             builder.Entity<ProjectRole>(b =>

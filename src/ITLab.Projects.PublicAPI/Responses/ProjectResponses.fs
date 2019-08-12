@@ -12,7 +12,7 @@ type Compact = {
     GitRepoLink: string
     TasksLink: string
     LogoLink: string
-    ProjectTags: ICollection<string>
+    ProjectTags: ICollection<TagResponses.Compact>
 }
 
 [<CLIMutable>]
@@ -33,6 +33,6 @@ type Full = {
     GitRepoLink: string
     TasksLink: string
     LogoLink: string
-    Tags: ICollection<string>
+    Tags: ICollection<TagResponses.Full>
     Participations: ICollection<Participation>
 }

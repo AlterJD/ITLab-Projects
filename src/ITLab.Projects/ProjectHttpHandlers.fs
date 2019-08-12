@@ -13,27 +13,6 @@ module ProjectHttpHandlers =
     open Giraffe
     open ITLab.Projects.Models
 
-
-
-
-    let tryParseInt s = 
-        try 
-            s |> int |> Some
-        with :? FormatException -> 
-            None
-    
-    let wrapOption value =
-        if (box value = null) then None else Some(value)
-    
-    let firstOrSecond first second =
-        if (box first = null) then second else first
-
-    let getIntQueryValue (ctx : HttpContext) name defaultVal =
-        ctx.TryGetQueryStringValue name
-            |> Option.defaultValue "incorrect"
-            |> tryParseInt
-            |> Option.defaultValue defaultVal
-
     let allprojects =
         fun (next : HttpFunc) (ctx : HttpContext) ->
             let limit = getIntQueryValue ctx "limit" 10
@@ -62,7 +41,10 @@ module ProjectHttpHandlers =
                             GitRepoLink = project.GitRepoLink
                             TasksLink = project.TasksLink
                             LogoLink = project.LogoLink
-                            ProjectTags = project.ProjectTags.Select(fun pt -> pt.Tag.Value).ToList()
+                            ProjectTags = project.ProjectTags.Select(fun pt -> {
+                                TagResponses.Compact.Value = pt.Tag.Value
+                                TagResponses.Compact.Color = pt.Tag.Color
+                                }).ToList()
                         }
                 }
                 return! json projects next ctx
@@ -84,7 +66,11 @@ module ProjectHttpHandlers =
                          GitRepoLink = project.GitRepoLink
                          TasksLink = project.TasksLink
                          LogoLink = project.LogoLink
-                         Tags = project.ProjectTags.Select(fun pt -> pt.Tag.Value).ToList()
+                         Tags = project.ProjectTags.Select(fun pt -> {
+                            TagResponses.Full.Id = pt.Tag.Id
+                            TagResponses.Full.Value = pt.Tag.Value
+                            TagResponses.Full.Color = pt.Tag.Color
+                            }).ToList()
                          Participations = project.Participations.Select(fun p -> {
                             UserId = p.UserId
                             RoleId = p.ProjectRoleId

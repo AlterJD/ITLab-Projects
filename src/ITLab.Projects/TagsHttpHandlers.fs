@@ -12,22 +12,7 @@ module TagsHttpHandlers =
     open FSharp.Control.Tasks.V2.ContextInsensitive
     open Giraffe
     open ITLab.Projects.Models
-    open Microsoft.FSharp.Linq.RuntimeHelpers
-
-    let tryParseInt s = 
-        try 
-            s |> int |> Some
-        with :? FormatException -> 
-            None
-    
-    let wrapOption value =
-        if (box value = null) then None else Some(value)
-
-    let getIntQueryValue (ctx : HttpContext) name defaultVal =
-        ctx.TryGetQueryStringValue name
-            |> Option.defaultValue "incorrect"
-            |> tryParseInt
-            |> Option.defaultValue defaultVal
+    open Microsoft.EntityFrameworkCore
 
     let allTags =
         fun (next : HttpFunc) (ctx : HttpContext) ->
@@ -49,65 +34,64 @@ module TagsHttpHandlers =
                         sortBy tag.Value
                         skip start
                         take limit
-                        select tag.Value
+                        select {
+                            TagResponses.Full.Id = tag.Id
+                            TagResponses.Full.Value = tag.Value
+                            TagResponses.Full.Color = tag.Color
+                        }
                 }
                 return! json tags next ctx
             }
 
-    let addTagToProject (id: Guid) = 
+    let addTag (request: TagRequests.CreateEdit) =
+        fun (next : HttpFunc) (ctx : HttpContext) ->
+            let correct = match request.Color with
+                            | Regex @"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$" _ -> true
+                            | _  -> false
+            if not correct then
+                RequestErrors.BAD_REQUEST "incorrect color format" next ctx
+            else
+                let db = ctx.GetService<ProjectsContext>()
+                task {
+                    let! another = db.Tags.FirstOrDefaultAsync(fun t -> t.Value = request.Value)
+                    match wrapOption another with 
+                    | Some tag
+                        -> return! RequestErrors.CONFLICT "tag exists" next ctx
+                    | None -> 
+                        let tag = {
+                            Id = Guid.NewGuid()
+                            Value = request.Value
+                            Color = request.Color
+                            ProjectTags = new ResizeArray<ProjectTag>()
+                        }
+    
+                        db.Tags.Add(tag) |> ignore
+                        let! saved = db.SaveChangesAsync()
+                        return! json tag next ctx
+
+            }
+
+    let addTagToProject (projectId: Guid) (tagId: Guid) = 
         fun (next : HttpFunc) (ctx : HttpContext) ->
             let db = ctx.GetService<ProjectsContext>()
             task {
-                let! wantedTag = ctx.BindJsonAsync<string>()
-                let project = query {
-                    for p in db.Projects do
-                        where (p.Id = id)
-                        select (p, p.ProjectTags.Select(fun pt -> pt.Tag).ToList())
-                        exactlyOneOrDefault
-                }
-                
-                match wrapOption project with
-                | None -> return! RequestErrors.NOT_FOUND "not found project" next ctx
+                let! targetProject = db.Projects
+                                        .Include(fun p -> p.ProjectTags)
+                                        .Where(fun p -> p.Id = projectId)
+                                        .SingleOrDefaultAsync()
+                match wrapOption targetProject with
+                | None -> 
+                    return! RequestErrors.NOT_FOUND "no project" next ctx
                 | Some project ->
-                    let project, tags = project
-
-                    if tags.Any(fun t -> t.Value = wantedTag)
-                    then return! json wantedTag next ctx
-                    else
-                        let tag = query {
-                            for projectTag in db.ProjectTags do
-                                where (projectTag.Tag.Value = wantedTag)
-                                select projectTag.Tag
-                                exactlyOneOrDefault
-                        }
-
+                    match project.ProjectTags.Any(fun pt -> pt.TagId = tagId) with
+                    | true ->
+                        return! RequestErrors.BAD_REQUEST "project already contains tag" next ctx
+                    | false ->
+                        let! tag = db.Tags.FindAsync(tagId)
                         match wrapOption tag with
+                        | None -> 
+                            return! RequestErrors.NOT_FOUND "no tag" next ctx
                         | Some tag ->
-                            let projTag = {
-                                ProjectId = id
-                                TagId = tag.Id
-                                Project = project
-                                Tag = tag
-                            }
-                            db.ProjectTags.Add(projTag) |> ignore
-                            let! saved = db.SaveChangesAsync()
-                            return! json wantedTag next ctx
-                        | None ->
-                            let tag = {
-                                Id = Guid.NewGuid()
-                                Value = wantedTag
-                                ProjectTags = new ResizeArray<ProjectTag>()
-                            }
-                            let projTag = {
-                                ProjectId = id
-                                TagId = tag.Id
-                                Project = project
-                                Tag = tag
-                            }
-                            db.Tags.Add(tag) |> ignore
-                            db.ProjectTags.Add(projTag) |> ignore
-                            let! saved = db.SaveChangesAsync()
-                            return! json wantedTag next ctx
             }
     let removeTagFromProject (id: Guid) = 
         fun (next : HttpFunc) (ctx : HttpContext) ->
