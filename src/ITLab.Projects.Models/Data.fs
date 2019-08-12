@@ -20,6 +20,10 @@ type Project = {
 and [<CLIMutable>] Tag = {
     Id: Guid
     Value: string
+    /// <summary>
+    /// Tag color in HEX format
+    ///</summary>
+    Color: string
     ProjectTags: ICollection<ProjectTag>
 }
 

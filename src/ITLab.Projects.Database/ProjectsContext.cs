@@ -23,21 +23,27 @@ namespace ITLab.Projects.Database
 
             builder.Entity<Project>(b =>
             {
-                b.HasIndex(p => p.Name);
+                b.HasIndex(p => p.Name)
+                    .IsUnique(true);
                 b.Property(p => p.Name)
                     .IsRequired(true);
             });
 
             builder.Entity<Tag>(b =>
             {
-                b.HasIndex(t => t.Value);
+                b.HasIndex(t => t.Value)
+                    .IsUnique(true);
                 b.Property(t => t.Value)
                     .IsRequired(true);
+                b.Property(t => t.Color)
+                    .IsRequired(true)
+                    .HasDefaultValue("#ffffff");
             });
 
             builder.Entity<ProjectRole>(b =>
             {
-                b.HasIndex(pr => pr.Name);
+                b.HasIndex(pr => pr.Name)
+                    .IsUnique(true);
                 b.Property(pr => pr.Name)
                     .IsRequired(true);
             });

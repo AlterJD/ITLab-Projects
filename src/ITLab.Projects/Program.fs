@@ -24,7 +24,6 @@ open Microsoft.AspNetCore.Authentication.JwtBearer
 // Web app
 // ---------------------------------
 
-
 let allowSynchronousIO  : HttpHandler =
     fun (next : HttpFunc) (ctx : HttpContext) ->
         let logger = ctx.GetService<ILoggerFactory>().CreateLogger("routing")
@@ -32,30 +31,41 @@ let allowSynchronousIO  : HttpHandler =
         ctx.Features.Get<IHttpBodyControlFeature>().AllowSynchronousIO <- true
         next ctx
 
-
 let mustBeLoggedIn = requiresAuthentication (challenge "Bearer")
         
 let webApp =
     mustBeLoggedIn >=> subRoute "/api/projects" 
         (choose [
-            subRoute "/tags" allTags
+            subRoute "/tags" (choose [
+                subRoutef "/%O" (fun (tagId:Guid) -> 
+                    choose [
+                        PUT >=> allowSynchronousIO
+                            >=> bindJson<TagRequests.CreateEdit> (editTag tagId) ])
+                subRoute ""
+                    (choose [
+                        GET  >=> allTags
+                        POST >=> allowSynchronousIO 
+                             >=> bindJson<TagRequests.CreateEdit> addTag])
+            ])
 
-            subRoutef "/%O" (fun (id:Guid) -> 
+            subRoutef "/%O" (fun (projectId:Guid) -> 
                 choose [
-                    subRoute "/tags" 
-                        (choose [
-                            POST >=> allowSynchronousIO >=> (addTagToProject id)
-                            DELETE >=> allowSynchronousIO >=> (removeTagFromProject id) ])
+                    subRoutef "/tags/%O" (fun (tagId:Guid) ->
+                        choose [
+                            POST   >=> (addTagToProject      projectId tagId)
+                            DELETE >=> (removeTagFromProject projectId tagId) ] )
 
                     subRoute "" 
                         (choose [
-                            GET >=> (oneProject id)
-                            PUT >=> allowSynchronousIO >=> (editProject id)
-                            DELETE >=> (removeProject id) ]) ])
+                            GET    >=> (oneProject projectId)
+                            PUT    >=> allowSynchronousIO 
+                                   >=> (editProject projectId)
+                            DELETE >=> (removeProject projectId) ]) ])
             subRoute "" 
                 (choose [
-                    GET >=> allprojects
-                    POST >=> allowSynchronousIO >=> addProject ]) ])
+                    GET  >=> allprojects
+                    POST >=> allowSynchronousIO 
+                         >=> addProject ]) ])
 
 // ---------------------------------
 // Error handler

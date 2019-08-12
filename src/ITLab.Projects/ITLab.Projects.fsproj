@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Stuff.fs" />
     <Compile Include="TagsHttpHandlers.fs" />
     <Compile Include="ProjectHttpHandlers.fs" />
     <Content Include="appsettings.example.postgres.json">
