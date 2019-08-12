@@ -39,8 +39,9 @@ let webApp =
             subRoute "/tags" (choose [
                 subRoutef "/%O" (fun (tagId:Guid) -> 
                     choose [
-                        PUT >=> allowSynchronousIO
-                            >=> bindJson<TagRequests.CreateEdit> (editTag tagId) ])
+                        PUT    >=> allowSynchronousIO
+                               >=> bindJson<TagRequests.CreateEdit> (editTag tagId)
+                        DELETE >=> removeTag tagId])
                 subRoute ""
                     (choose [
                         GET  >=> allTags

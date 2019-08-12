@@ -67,9 +67,9 @@ module ProjectHttpHandlers =
                          TasksLink = project.TasksLink
                          LogoLink = project.LogoLink
                          Tags = project.ProjectTags.Select(fun pt -> {
-                            TagResponses.Full.Id = pt.Tag.Id
-                            TagResponses.Full.Value = pt.Tag.Value
-                            TagResponses.Full.Color = pt.Tag.Color
+                            TagResponses.ProjectView.Id = pt.Tag.Id
+                            TagResponses.ProjectView.Value = pt.Tag.Value
+                            TagResponses.ProjectView.Color = pt.Tag.Color
                             }).ToList()
                          Participations = project.Participations.Select(fun p -> {
                             UserId = p.UserId
