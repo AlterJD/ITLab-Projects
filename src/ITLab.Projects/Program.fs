@@ -37,27 +37,35 @@ let webApp =
     mustBeLoggedIn >=> subRoute "/api/projects" 
         (choose [
             subRoute "/tags" (choose [
-                GET >=> allTags
-                POST >=> allowSynchronousIO 
-                     >=> bindJson<TagRequests.CreateEdit> addTag
+                subRoutef "/%O" (fun (tagId:Guid) -> 
+                    choose [
+                        PUT >=> allowSynchronousIO
+                            >=> bindJson<TagRequests.CreateEdit> (editTag tagId) ])
+                subRoute ""
+                    (choose [
+                        GET  >=> allTags
+                        POST >=> allowSynchronousIO 
+                             >=> bindJson<TagRequests.CreateEdit> addTag])
             ])
 
             subRoutef "/%O" (fun (projectId:Guid) -> 
                 choose [
                     subRoutef "/tags/%O" (fun (tagId:Guid) ->
                         choose [
-                            POST >=> (addTagToProject projectId tagId)
+                            POST   >=> (addTagToProject      projectId tagId)
                             DELETE >=> (removeTagFromProject projectId tagId) ] )
 
                     subRoute "" 
                         (choose [
-                            GET >=> (oneProject projectId)
-                            PUT >=> allowSynchronousIO >=> (editProject projectId)
+                            GET    >=> (oneProject projectId)
+                            PUT    >=> allowSynchronousIO 
+                                   >=> (editProject projectId)
                             DELETE >=> (removeProject projectId) ]) ])
             subRoute "" 
                 (choose [
-                    GET >=> allprojects
-                    POST >=> allowSynchronousIO >=> addProject ]) ])
+                    GET  >=> allprojects
+                    POST >=> allowSynchronousIO 
+                         >=> addProject ]) ])
 
 // ---------------------------------
 // Error handler

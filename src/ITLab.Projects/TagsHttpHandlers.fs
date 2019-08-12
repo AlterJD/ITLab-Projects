@@ -14,6 +14,11 @@ module TagsHttpHandlers =
     open ITLab.Projects.Models
     open Microsoft.EntityFrameworkCore
 
+
+    let checkTagColor color = match color with
+                                | Regex @"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$" _ -> true
+                                | _  -> false
+
     let allTags =
         fun (next : HttpFunc) (ctx : HttpContext) ->
             let limit = getIntQueryValue ctx "limit" 10
@@ -45,10 +50,7 @@ module TagsHttpHandlers =
 
     let addTag (request: TagRequests.CreateEdit) =
         fun (next : HttpFunc) (ctx : HttpContext) ->
-            let correct = match request.Color with
-                            | Regex @"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$" _ -> true
-                            | _  -> false
-            if not correct then
+            if not (checkTagColor request.Color) then
                 RequestErrors.BAD_REQUEST "incorrect color format" next ctx
             else
                 let db = ctx.GetService<ProjectsContext>()
@@ -70,6 +72,32 @@ module TagsHttpHandlers =
                         return! json tag next ctx
 
             }
+    let editTag (tagId: Guid) (request: TagRequests.CreateEdit) = 
+        fun (next: HttpFunc) (ctx: HttpContext) ->
+            if not (String.IsNullOrEmpty request.Color) && not (checkTagColor request.Color) then
+                RequestErrors.BAD_REQUEST "incorrect color format" next ctx
+            else
+                let db = ctx.GetService<ProjectsContext>()
+                task {
+                    let! targetTag = db.Tags.FindAsync(tagId)
+                    match wrapOption targetTag with
+                    | None -> return! RequestErrors.NOT_FOUND "not found tag" next ctx
+                    | Some _ ->
+                        let newTag = { targetTag with
+                                        Value = firstOrSecond request.Value targetTag.Value
+                                        Color = firstOrSecond request.Color targetTag.Color }
+                        db.Entry(targetTag).State <- EntityState.Detached
+                        db.Tags.Update(newTag) |> ignore
+                        let saved = try
+                                        Some(db.SaveChanges())
+                                    with
+                                    | :? DbUpdateException as ex -> None
+                        match saved with
+                        | None -> return! RequestErrors.BAD_REQUEST "tag value exists" next ctx
+                        | Some _ ->
+                            return! json newTag next ctx
+                }
+
 
     let addTagToProject (projectId: Guid) (tagId: Guid) = 
         fun (next : HttpFunc) (ctx : HttpContext) ->
@@ -92,25 +120,33 @@ module TagsHttpHandlers =
                         | None -> 
                             return! RequestErrors.NOT_FOUND "no tag" next ctx
                         | Some tag ->
+                            let projectTag = {
+                                ProjectId = projectId
+                                TagId = tagId
+                                Project = project
+                                Tag = tag
+                            }
+                            db.ProjectTags.Add projectTag |> ignore
+                            let! saved = db.SaveChangesAsync()
+                            return! Successful.OK "tag added" next ctx
             }
-    let removeTagFromProject (id: Guid) = 
+    let removeTagFromProject (id: Guid) (tagId: Guid) = 
         fun (next : HttpFunc) (ctx : HttpContext) ->
             let db = ctx.GetService<ProjectsContext>()
             task {
-                let! wantedTag = ctx.BindJsonAsync<string>()
 
                 let targetLink = query {
                     for pt in db.ProjectTags do
-                    where (pt.ProjectId = id && pt.Tag.Value = wantedTag)
+                    where (pt.ProjectId = id && pt.TagId = tagId)
                     exactlyOneOrDefault
                 }
 
                 match wrapOption targetLink with
-                | None -> return! json wantedTag next ctx
+                | None -> return! RequestErrors.NOT_FOUND "no link between tag and project" next ctx
                 | Some link ->
                     db.ProjectTags.Remove(link) |> ignore
                     let! saved = db.SaveChangesAsync()
-                    return! json wantedTag next ctx
+                    return! Successful.OK "tagremoved " next ctx
             }
             
 
