@@ -9,6 +9,10 @@ pool:
 
 steps:
 
+  - checkout: self
+    clean: true
+    fetchDepth: 1
+
   - task: DotNetCoreCLI@2
     displayName: dotnet restore
     inputs:
