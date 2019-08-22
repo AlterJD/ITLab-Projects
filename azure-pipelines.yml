@@ -46,9 +46,9 @@ steps:
       modifyOutputPath: false
 
   - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: itlab-projects-$(Build.SourceBranchName)'
+    displayName: 'Publish Artifact: itlab-projects-build'
     inputs:
-      ArtifactName: 'itlab-projects-$(Build.SourceBranchName)'
+      ArtifactName: 'itlab-projects-build'
 
   - task: DeleteFiles@1
     inputs:
@@ -56,14 +56,14 @@ steps:
       Contents: '**'
 
   - task: CopyFiles@2
-    displayName: 'copy $(Build.SourceBranchName) artifact'
+    displayName: 'copy deploy artifact'
     inputs:
-      SourceFolder: 'deploy/$(Build.SourceBranchName)'
+      SourceFolder: 'deploy'
       Contents: '**'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
       CleanTargetFolder: true
 
   - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: itlab-projects-deploy-$(Build.SourceBranchName)'
+    displayName: 'Publish Artifact: itlab-projects-deploy'
     inputs:
-      ArtifactName: 'itlab-projects-deploy-$(Build.SourceBranchName)'
+      ArtifactName: 'itlab-projects-deploy'
