@@ -25,7 +25,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "ITLab.Projects.PublicAPI", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{0C640505-2236-440F-8BED-D8EDBAE9A30B}"
 	ProjectSection(SolutionItems) = preProject
-		deploy\master\Dockerfile = deploy\master\Dockerfile
+		deploy\Dockerfile = deploy\Dockerfile
 	EndProjectSection
 EndProject
 Global
