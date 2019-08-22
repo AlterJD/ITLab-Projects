@@ -33,8 +33,8 @@ let allowSynchronousIO  : HttpHandler =
 
 let mustBeLoggedIn = requiresAuthentication (challenge "Bearer")
         
-let webApp =
-    mustBeLoggedIn >=> subRoute "/api/projects" 
+let webAppLogic =
+    subRoute "/api/projects" 
         (choose [
             subRoute "/tags" (choose [
                 subRoutef "/%O" (fun (tagId:Guid) -> 
@@ -68,6 +68,7 @@ let webApp =
                     POST >=> allowSynchronousIO 
                          >=> addProject ]) ])
 
+let webApp (config: IConfiguration) = if config.GetValue<bool>("TESTS") then webAppLogic else mustBeLoggedIn >=> webAppLogic
 // ---------------------------------
 // Error handler
 // ---------------------------------
@@ -86,11 +87,11 @@ let configureCors (builder : CorsPolicyBuilder) =
            .AllowAnyHeader()
            |> ignore
 
-let configureApp (app : IApplicationBuilder) =
+let configureApp (config: IConfiguration) (app : IApplicationBuilder)  =
     app.UseGiraffeErrorHandler(errorHandler)
        .UseCors(configureCors)
        .UseAuthentication()
-       .UseGiraffe(webApp)
+       .UseGiraffe(config |> webApp)
 
 type CustomNegotiationConfig (baseConfig : INegotiationConfig) =
     let plainText x = text (x.ToString())
@@ -162,7 +163,7 @@ let main args =
     WebHostBuilder()
         .UseKestrel()
         .UseConfiguration(config)
-        .Configure(Action<IApplicationBuilder> configureApp)
+        .Configure(Action<IApplicationBuilder> (configureApp config))
         .ConfigureServices(configureServices config)    
         .ConfigureLogging(configureLogging)
         .Build()

@@ -17,14 +17,14 @@ open Microsoft.Extensions.Configuration
 
 let config = dict[
     ("DB_TYPE","IN_MEMORY")
-    
+    ("TESTS",  "true")
     ]
 
 let createHost() =
     let configuration = ConfigurationBuilder().AddInMemoryCollection(config).Build()
     WebHostBuilder()
         .UseContentRoot(Directory.GetCurrentDirectory())
-        .Configure(Action<IApplicationBuilder> ITLab.Projects.App.configureApp)
+        .Configure(Action<IApplicationBuilder> (ITLab.Projects.App.configureApp configuration))
         .ConfigureServices(Action<IServiceCollection> (ITLab.Projects.App.configureServices configuration))
 
 let runTask task =
