@@ -9,16 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Giraffe" Version="3.6.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0-preview8.19405.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0-preview8.19405.11" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.0-preview8" />
+    <PackageReference Include="Giraffe" Version="4.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.1" />
     <PackageReference Include="TaskBuilder.fs" Version="2.1.*" />
     <PackageReference Include="RTUITLab.WebApp.Configure" Version="1.0.1" />
 
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="DebugDataBaseCreate.fs" />
     <Compile Include="Stuff.fs" />
     <Compile Include="TagsHttpHandlers.fs" />
     <Compile Include="ProjectHttpHandlers.fs" />

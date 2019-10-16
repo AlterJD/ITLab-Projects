@@ -157,15 +157,27 @@ let configuration(args: string[]) =
         .AddJsonFile("appsettings.Secret.json", false)
         .Build()
 
+
+let buildWebHost config = 
+    WebHostBuilder()
+           .UseKestrel()
+           .UseConfiguration(config)
+           .Configure(Action<IApplicationBuilder> (configureApp config))
+           .ConfigureServices(configureServices config)    
+           .ConfigureLogging(configureLogging)
+           .Build()
+
+
+let fillDebugBD (webHost :IWebHost) = 
+    let scope = webHost.Services.CreateScope()
+    let db = scope.ServiceProvider.GetRequiredService<ProjectsContext>()
+    DebugDataBaseCreate.fillDb db |> ignore
+    scope.Dispose()
+
 [<EntryPoint>]
 let main args =
     let config = configuration args;
-    WebHostBuilder()
-        .UseKestrel()
-        .UseConfiguration(config)
-        .Configure(Action<IApplicationBuilder> (configureApp config))
-        .ConfigureServices(configureServices config)    
-        .ConfigureLogging(configureLogging)
-        .Build()
-        .Run()
+    let webHost = buildWebHost config;
+    if (config.GetValue("FILL_DEBUG")) then fillDebugBD webHost
+    webHost.Run()
     0
