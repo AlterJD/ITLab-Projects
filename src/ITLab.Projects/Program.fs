@@ -178,6 +178,6 @@ let fillDebugBD (webHost :IWebHost) =
 let main args =
     let config = configuration args;
     let webHost = buildWebHost config;
-    if (config.GetValue("FILL_DEBUG")) then fillDebugBD webHost
+    if (config.GetValue("FILL_DEBUG_DB")) then fillDebugBD webHost
     webHost.Run()
     0
