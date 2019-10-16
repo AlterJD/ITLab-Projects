@@ -37,7 +37,7 @@ master | develop | tests
 {
     "DB_TYPE": "IN_MEMORY",
     "FILL_DEBUG_DB": true,
-    "TEST": true,
+    "TESTS": true,
     "ConnectionStrings": {
         "Postgres": "CONNECTION STRING"
     },
