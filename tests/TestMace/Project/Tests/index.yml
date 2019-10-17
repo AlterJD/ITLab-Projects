@@ -1,5 +1,6 @@
 children:
   - Get tags 200 array
+  - Get projects
 variables: {}
 type: Folder
 authData:
