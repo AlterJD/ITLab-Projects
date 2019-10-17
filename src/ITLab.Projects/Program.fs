@@ -127,7 +127,15 @@ let configureServices (configuration: IConfiguration) (services : IServiceCollec
            CustomNegotiationConfig(
                DefaultNegotiationConfig())
        ) |> ignore
-    services.AddWebAppConfigure().AddTransientConfigure<MigrationApplyWork>() |> ignore
+    
+    let webAppconfiguration = services.AddWebAppConfigure()
+    
+    if (configuration.GetValue("FILL_DEBUG_DB")) then
+        services.AddTransient<MigrationApplyWork>().AddTransient<DebugDataBaseCreate.FillDatabaseWork>() |> ignore
+        webAppconfiguration.AddTransientConfigure<SequenceConfigureWork<MigrationApplyWork, DebugDataBaseCreate.FillDatabaseWork>>() |> ignore
+    else
+        webAppconfiguration.AddTransientConfigure<MigrationApplyWork>() |> ignore
+
     services.AddCors()    |> ignore
     services.AddGiraffe() |> ignore
 
@@ -157,15 +165,26 @@ let configuration(args: string[]) =
         .AddJsonFile("appsettings.Secret.json", false)
         .Build()
 
+
+let buildWebHost config = 
+    WebHostBuilder()
+           .UseKestrel()
+           .UseConfiguration(config)
+           .Configure(Action<IApplicationBuilder> (configureApp config))
+           .ConfigureServices(configureServices config)    
+           .ConfigureLogging(configureLogging)
+           .Build()
+
+
+let fillDebugBD (webHost :IWebHost) = 
+    let scope = webHost.Services.CreateScope()
+    let db = scope.ServiceProvider.GetRequiredService<ProjectsContext>()
+    DebugDataBaseCreate.fillDb db |> ignore
+    scope.Dispose()
+
 [<EntryPoint>]
 let main args =
     let config = configuration args;
-    WebHostBuilder()
-        .UseKestrel()
-        .UseConfiguration(config)
-        .Configure(Action<IApplicationBuilder> (configureApp config))
-        .ConfigureServices(configureServices config)    
-        .ConfigureLogging(configureLogging)
-        .Build()
-        .Run()
+    let webHost = buildWebHost config;
+    webHost.Run()
     0

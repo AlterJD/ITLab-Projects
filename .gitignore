@@ -340,3 +340,5 @@ ASALocalRun/
 healthchecksdb
 /src/ITLab.Projects/appsettings.Secret.json
 /src/ITLab.Projects.Database/appsettings.Secret.json
+
+tests/docker/out/

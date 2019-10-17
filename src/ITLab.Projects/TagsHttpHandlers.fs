@@ -46,6 +46,7 @@ module TagsHttpHandlers =
                             TagResponses.Full.UseCount = tag.ProjectTags.Count
                         }
                 }
+                let! tags = tags.ToListAsync()
                 return! json tags next ctx
             }
 

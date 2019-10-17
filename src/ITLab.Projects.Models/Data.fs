@@ -53,5 +53,5 @@ and [<CLIMutable>] Participation = {
     ProjectRole: ProjectRole
 
     From: DateTime
-    To: DateTime
+    To: Nullable<DateTime>
 }

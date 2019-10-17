@@ -16,7 +16,8 @@ open Microsoft.Extensions.Configuration
 // ---------------------------------
 
 let config = dict[
-    ("DB_TYPE","IN_MEMORY")
+    ("DB_TYPE","POSTGRES")
+    ("ConnectionStrings:Postgres", "User ID=postgres;Password=password;Server=postgres-db;Port=5432;Database=TestDBdotnet;Integrated Security=true;")
     ("TESTS",  "true")
     ]
 

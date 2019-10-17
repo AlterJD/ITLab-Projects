@@ -1,0 +1,22 @@
+projectUId: 1f9f4830-f0b5-11e9-851a-e1d11b479a48
+type: Project
+name: Project
+environments:
+  environments:
+    LocalEnv:
+      baseUrl: 'http://localhost:54052'
+    testmace:
+      baseUrl: 'http://web-app'
+children:
+  - Tests
+variables: {}
+authData:
+  type: inherit
+settings:
+  proxy:
+    enable: false
+requestData:
+  headers: []
+  disabledInheritedHeaders: []
+  strictSSL: 'No'
+cookies: []

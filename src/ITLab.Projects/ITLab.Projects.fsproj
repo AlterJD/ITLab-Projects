@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <DebugType>portable</DebugType>
     <AssemblyName>ITLab.Projects</AssemblyName>
     <OutputType>Exe</OutputType>
@@ -9,22 +9,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Giraffe" Version="3.6.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0-preview8.19405.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0-preview8.19405.11" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.0-preview8" />
+    <PackageReference Include="Giraffe" Version="4.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0-preview1.19508.20" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.0-preview1.19506.2" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.1" />
     <PackageReference Include="TaskBuilder.fs" Version="2.1.*" />
     <PackageReference Include="RTUITLab.WebApp.Configure" Version="1.0.1" />
 
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Dockerfile" />
     <Compile Include="Stuff.fs" />
+    <Compile Include="DebugDataBaseCreate.fs" />
     <Compile Include="TagsHttpHandlers.fs" />
     <Compile Include="ProjectHttpHandlers.fs" />
     <Content Include="appsettings.example.postgres.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="appsettings.TestMace.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
     <Content Include="appsettings.Secret.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

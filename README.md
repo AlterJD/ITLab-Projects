@@ -35,7 +35,9 @@ master | develop | tests
 
 ```json
 {
-    "DB_TYPE": "TYPE",
+    "DB_TYPE": "IN_MEMORY",
+    "FILL_DEBUG_DB": true,
+    "TESTS": true,
     "ConnectionStrings": {
         "Postgres": "CONNECTION STRING"
     },
@@ -49,6 +51,10 @@ master | develop | tests
 
 * **IN_MEMORY** - to use in memory database for debug or first start
 * **POSTGRES** - to use PostgreSQL database with connection string from ```ConnectionStrings:Postgres```
+
+**FILL_DEBUG_DB** ( true | false ) - fill database with default values
+
+**TESTS** ( true | false ) - if true: acess token not required
 
 **AUTHORIZATION**
 
