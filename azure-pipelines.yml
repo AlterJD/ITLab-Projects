@@ -4,11 +4,12 @@ trigger:
 
 name: $(BuildID)-$(Build.SourceBranchName)
 
-pool:
-  name: Default
 
-steps:
-
+jobs:
+- job: build
+  pool:
+    name: Default
+  steps:
   - checkout: self
     clean: true
     fetchDepth: 1
@@ -71,3 +72,21 @@ steps:
     displayName: 'Publish Artifact: itlab-projects-deploy'
     inputs:
       ArtifactName: 'itlab-projects-deploy'
+- job: test
+  pool:
+    name: Default
+  steps:
+  - task: CmdLine@2
+    inputs:
+      script: |
+        docker-compose --no-ansi build
+        docker-compose --no-ansi up -d web-app
+        docker-compose --no-ansi up testmace
+        docker-compose --no-ansi rm -s -f
+      workingDirectory: './tests/docker'
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: 'testmace*.xml'
+      searchFolder: 'tests/docker/out'
+      failTaskOnFailedTests: true
