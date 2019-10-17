@@ -19,6 +19,7 @@ open Newtonsoft.Json
 open Newtonsoft.Json.Serialization
 open ITLab.Projects.TagsHttpHandlers
 open Microsoft.AspNetCore.Authentication.JwtBearer
+open ITLab.Projects.ProjectRolesHttpHandlers
 
 // ---------------------------------
 // Web app
@@ -36,6 +37,14 @@ let mustBeLoggedIn = requiresAuthentication (challenge "Bearer")
 let webAppLogic =
     subRoute "/api/projects" 
         (choose [
+
+            subRoute "/roles"(choose [
+                subRoute "" (choose [
+                    GET >=> allRoles
+                ])
+            ]
+            )
+
             subRoute "/tags" (choose [
                 subRoutef "/%O" (fun (tagId:Guid) -> 
                     choose [
@@ -68,7 +77,7 @@ let webAppLogic =
                     POST >=> allowSynchronousIO 
                          >=> addProject ]) ])
 
-let webApp (config: IConfiguration) = if config.GetValue<bool>("TESTS") then webAppLogic else mustBeLoggedIn >=> webAppLogic
+let webApp (config: IConfiguration) = mustBeLoggedIn >=> webAppLogic
 // ---------------------------------
 // Error handler
 // ---------------------------------
@@ -112,6 +121,7 @@ exception InvalidDbType of string
 let configureJwt (configuration: IConfiguration) (options: JwtBearerOptions) =
     options.Authority <- configuration.GetValue<string> "JWT:Authority"
     options.RequireHttpsMetadata <- false
+    options.TokenValidationParameters.ValidateLifetime <- not (configuration.GetValue<bool>("TESTS"))
     options.Audience <- "itlab.projects"
 
 let configureServices (configuration: IConfiguration) (services : IServiceCollection) =
@@ -127,21 +137,22 @@ let configureServices (configuration: IConfiguration) (services : IServiceCollec
            CustomNegotiationConfig(
                DefaultNegotiationConfig())
        ) |> ignore
-    
-    let webAppconfiguration = services.AddWebAppConfigure()
-    
+
+    let webAppConfiguration = services.AddWebAppConfigure()
+    webAppConfiguration.AddTransientConfigure<PredefinedDatabaseValues.Filler>() |> ignore
     if (configuration.GetValue("FILL_DEBUG_DB")) then
         services.AddTransient<MigrationApplyWork>().AddTransient<DebugDataBaseCreate.FillDatabaseWork>() |> ignore
-        webAppconfiguration.AddTransientConfigure<SequenceConfigureWork<MigrationApplyWork, DebugDataBaseCreate.FillDatabaseWork>>() |> ignore
+        webAppConfiguration.AddTransientConfigure<SequenceConfigureWork<MigrationApplyWork, DebugDataBaseCreate.FillDatabaseWork>>() |> ignore
     else
-        webAppconfiguration.AddTransientConfigure<MigrationApplyWork>() |> ignore
+        webAppConfiguration.AddTransientConfigure<MigrationApplyWork>() |> ignore
 
     services.AddCors()    |> ignore
     services.AddGiraffe() |> ignore
 
     let customSettings = JsonSerializerSettings(
                             DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                            ContractResolver = CamelCasePropertyNamesContractResolver()
+                            ContractResolver = CamelCasePropertyNamesContractResolver(),
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                             //, 
                             //NullValueHandling = NullValueHandling.Ignore
                             )

@@ -26,6 +26,7 @@ module DebugDataBaseCreate =
                 GitRepoLink = "https://github.com/ITLabRTUMIREA/ITLab-Projects"
                 TasksLink = ""
                 LogoLink = ""
+                CreatorId = Guid.Empty
                 ProjectTags = new ResizeArray<ProjectTag>()
                 Participations = new ResizeArray<Participation>()
             }

@@ -39,6 +39,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestMace", "TestMace", "{88
 		tests\TestMace\Dockerfile = tests\TestMace\Dockerfile
 	EndProjectSection
 EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "ITLab.Projects.Stuff", "src\ITLab.Projects.Stuff\ITLab.Projects.Stuff.fsproj", "{75823489-B986-493E-8968-22EA6A086769}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -109,6 +111,18 @@ Global
 		{B3153E69-7CA5-4F63-AAF0-EA56A6E5C386}.Release|x64.Build.0 = Release|Any CPU
 		{B3153E69-7CA5-4F63-AAF0-EA56A6E5C386}.Release|x86.ActiveCfg = Release|Any CPU
 		{B3153E69-7CA5-4F63-AAF0-EA56A6E5C386}.Release|x86.Build.0 = Release|Any CPU
+		{75823489-B986-493E-8968-22EA6A086769}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75823489-B986-493E-8968-22EA6A086769}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75823489-B986-493E-8968-22EA6A086769}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{75823489-B986-493E-8968-22EA6A086769}.Debug|x64.Build.0 = Debug|Any CPU
+		{75823489-B986-493E-8968-22EA6A086769}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{75823489-B986-493E-8968-22EA6A086769}.Debug|x86.Build.0 = Debug|Any CPU
+		{75823489-B986-493E-8968-22EA6A086769}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75823489-B986-493E-8968-22EA6A086769}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75823489-B986-493E-8968-22EA6A086769}.Release|x64.ActiveCfg = Release|Any CPU
+		{75823489-B986-493E-8968-22EA6A086769}.Release|x64.Build.0 = Release|Any CPU
+		{75823489-B986-493E-8968-22EA6A086769}.Release|x86.ActiveCfg = Release|Any CPU
+		{75823489-B986-493E-8968-22EA6A086769}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -122,6 +136,7 @@ Global
 		{0C640505-2236-440F-8BED-D8EDBAE9A30B} = {8CA054F0-8A0B-4021-BF79-E616EF89B0DC}
 		{CC0A6B0D-BC42-4817-9B0C-8E18C48B32D1} = {67DB06E6-6771-470C-9191-6BB5A66BC7A9}
 		{882F8BED-7861-4B3B-89FE-620738E37710} = {67DB06E6-6771-470C-9191-6BB5A66BC7A9}
+		{75823489-B986-493E-8968-22EA6A086769} = {48D133E2-0428-4425-BA47-49B570ED6732}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A63C057-0B2C-4D56-B324-9C7DD21A0B44}

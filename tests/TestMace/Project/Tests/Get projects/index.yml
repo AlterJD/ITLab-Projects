@@ -21,4 +21,4 @@ requestData:
   strictSSL: Inherit
 authData:
   type: inherit
-name: Scratch 2
+name: Get projects

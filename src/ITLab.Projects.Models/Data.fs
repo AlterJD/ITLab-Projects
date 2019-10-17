@@ -13,6 +13,7 @@ type Project = {
     GitRepoLink: string
     TasksLink: string
     LogoLink: string
+    CreatorId: Guid
     ProjectTags: ICollection<ProjectTag>
     Participations: ICollection<Participation>
 }
@@ -53,5 +54,5 @@ and [<CLIMutable>] Participation = {
     ProjectRole: ProjectRole
 
     From: DateTime
-    To: Nullable<DateTime>
+    To: DateTime option
 }
