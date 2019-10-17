@@ -1,0 +1,19 @@
+version: "3.7"
+
+services:
+  postgres-db:
+    image: postgres:11.4-alpine
+    environment:
+      - POSTGRES_PASSWORD=password
+  web-app:
+    depends_on:
+      - postgres-db
+    build:
+      context: ../../
+      dockerfile: src/ITLab.Projects/Dockerfile
+  testmace:
+    depends_on:
+      - web-app
+    build: ../TestMace
+    volumes:
+      - ./out:/out

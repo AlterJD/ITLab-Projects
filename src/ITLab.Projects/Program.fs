@@ -127,7 +127,15 @@ let configureServices (configuration: IConfiguration) (services : IServiceCollec
            CustomNegotiationConfig(
                DefaultNegotiationConfig())
        ) |> ignore
-    services.AddWebAppConfigure().AddTransientConfigure<MigrationApplyWork>() |> ignore
+    
+    let webAppconfiguration = services.AddWebAppConfigure()
+    
+    if (configuration.GetValue("FILL_DEBUG_DB")) then
+        services.AddTransient<MigrationApplyWork>().AddTransient<DebugDataBaseCreate.FillDatabaseWork>() |> ignore
+        webAppconfiguration.AddTransientConfigure<SequenceConfigureWork<MigrationApplyWork, DebugDataBaseCreate.FillDatabaseWork>>() |> ignore
+    else
+        webAppconfiguration.AddTransientConfigure<MigrationApplyWork>() |> ignore
+
     services.AddCors()    |> ignore
     services.AddGiraffe() |> ignore
 
@@ -178,6 +186,5 @@ let fillDebugBD (webHost :IWebHost) =
 let main args =
     let config = configuration args;
     let webHost = buildWebHost config;
-    if (config.GetValue("FILL_DEBUG_DB")) then fillDebugBD webHost
     webHost.Run()
     0

@@ -13,6 +13,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "ITLab.Projects.Tests", "tes
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8CA054F0-8A0B-4021-BF79-E616EF89B0DC}"
 	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
 		azure-pipelines.yml = azure-pipelines.yml
 		README.md = README.md
 	EndProjectSection
@@ -26,6 +27,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{0C640505-2236-440F-8BED-D8EDBAE9A30B}"
 	ProjectSection(SolutionItems) = preProject
 		deploy\Dockerfile = deploy\Dockerfile
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{CC0A6B0D-BC42-4817-9B0C-8E18C48B32D1}"
+	ProjectSection(SolutionItems) = preProject
+		tests\docker\docker-compose.yml = tests\docker\docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestMace", "TestMace", "{882F8BED-7861-4B3B-89FE-620738E37710}"
+	ProjectSection(SolutionItems) = preProject
+		tests\TestMace\Dockerfile = tests\TestMace\Dockerfile
 	EndProjectSection
 EndProject
 Global
@@ -109,6 +120,8 @@ Global
 		{D020ED14-EE30-44EF-B8A1-85C5289A6560} = {48D133E2-0428-4425-BA47-49B570ED6732}
 		{B3153E69-7CA5-4F63-AAF0-EA56A6E5C386} = {48D133E2-0428-4425-BA47-49B570ED6732}
 		{0C640505-2236-440F-8BED-D8EDBAE9A30B} = {8CA054F0-8A0B-4021-BF79-E616EF89B0DC}
+		{CC0A6B0D-BC42-4817-9B0C-8E18C48B32D1} = {67DB06E6-6771-470C-9191-6BB5A66BC7A9}
+		{882F8BED-7861-4B3B-89FE-620738E37710} = {67DB06E6-6771-470C-9191-6BB5A66BC7A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A63C057-0B2C-4D56-B324-9C7DD21A0B44}

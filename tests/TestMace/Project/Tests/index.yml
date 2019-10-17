@@ -1,0 +1,11 @@
+children:
+  - Get tags 200 array
+variables: {}
+type: Folder
+authData:
+  type: inherit
+requestData:
+  headers: []
+  disabledInheritedHeaders: []
+  strictSSL: Inherit
+name: Tests

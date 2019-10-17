@@ -1,0 +1,18 @@
+children: []
+variables: {}
+type: Assertion
+assertions:
+  - disabled: false
+    type: compare
+    actualValue: '${$response.code}'
+    operator: equal
+    expectedValue: '200'
+  - disabled: false
+    type: script
+    script: |-
+      function test(assertion, variables) {
+        // It should return true if test is passed
+        // return true;
+        return Array.isArray(variables.$response.body);
+      }
+name: Assertions

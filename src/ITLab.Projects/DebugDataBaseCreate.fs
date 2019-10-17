@@ -3,6 +3,9 @@
 open ITLab.Projects.Database
 open ITLab.Projects.Models
 open System
+open System.Threading.Tasks
+open WebApp.Configure.Models.Configure.Interfaces;
+
 
 module DebugDataBaseCreate =
     let projectId = Guid.Parse("b34b7186-1735-45d5-9756-857fd89ffe02")
@@ -63,4 +66,11 @@ module DebugDataBaseCreate =
         fillProjects dbContext  +
         fillTags dbContext +
         fillProjectTagLinks dbContext
+
+    type FillDatabaseWork(context : ProjectsContext) =
+        
+        interface IConfigureWork with
+            member this.Configure() =
+                fillDb context |> ignore
+                Task.CompletedTask
 

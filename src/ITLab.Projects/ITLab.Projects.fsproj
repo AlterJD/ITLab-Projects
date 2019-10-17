@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Dockerfile" />
     <Compile Include="Stuff.fs" />
     <Compile Include="DebugDataBaseCreate.fs" />
     <Compile Include="TagsHttpHandlers.fs" />
@@ -26,6 +27,9 @@
     <Content Include="appsettings.example.postgres.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="appsettings.TestMace.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
     <Content Include="appsettings.Secret.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
