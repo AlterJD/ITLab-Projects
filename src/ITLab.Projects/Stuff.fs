@@ -5,6 +5,7 @@ open Microsoft.AspNetCore.Http
 open System
 open System.Text.RegularExpressions
 open Giraffe
+open System.Security.Claims
 
 let wrapOption value =
     if (box value = null) then None else Some(value)
@@ -29,3 +30,6 @@ let (|Regex|_|) pattern input =
     let m = Regex.Match(input, pattern)
     if m.Success then Some(List.tail [ for g in m.Groups -> g.Value ])
     else None
+
+let UserId (ctx: HttpContext) =
+    Guid.Parse(ctx.User.FindFirst(ClaimTypes.NameIdentifier).Value)

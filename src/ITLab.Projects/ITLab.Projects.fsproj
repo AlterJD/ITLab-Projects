@@ -12,6 +12,7 @@
     <PackageReference Include="Giraffe" Version="4.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0-preview1.19508.20" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.0-preview1.19506.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.0-preview1.19506.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.1" />
     <PackageReference Include="TaskBuilder.fs" Version="2.1.*" />
     <PackageReference Include="RTUITLab.WebApp.Configure" Version="1.0.1" />
@@ -19,9 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Dockerfile" />
     <Compile Include="Stuff.fs" />
+    <Compile Include="Database\PredefinedDatabaseValues.fs" />
     <Compile Include="DebugDataBaseCreate.fs" />
+    <Compile Include="ProjectRolesHttpHandlers.fs" />
     <Compile Include="TagsHttpHandlers.fs" />
     <Compile Include="ProjectHttpHandlers.fs" />
     <Content Include="appsettings.example.postgres.json">
@@ -34,6 +36,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Compile Include="Program.fs" />
+    <Content Include="Dockerfile" />
   </ItemGroup>
 
   <ItemGroup>

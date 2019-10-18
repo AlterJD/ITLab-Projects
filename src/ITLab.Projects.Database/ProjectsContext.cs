@@ -1,7 +1,10 @@
 ﻿using ITLab.Projects.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
+using Microsoft.FSharp.Core;
+using System;
 
 namespace ITLab.Projects.Database
 {
@@ -54,6 +57,12 @@ namespace ITLab.Projects.Database
 
                 b.HasOne(pt => pt.Project).WithMany(p => p.ProjectTags).HasForeignKey(pt => pt.ProjectId);
                 b.HasOne(pt => pt.Tag).WithMany(p => p.ProjectTags).HasForeignKey(pt => pt.TagId);
+            });
+
+            builder.Entity<Participation>(b =>
+            {
+                var conversion = new ValueConverter<FSharpOption<DateTime>, DateTime>(Stuff.Database.fromOption<DateTime>(), Stuff.Database.toOption<DateTime>());
+                b.Property(p => p.To).HasConversion(conversion);
             });
         }
     }

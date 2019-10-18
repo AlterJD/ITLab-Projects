@@ -66,6 +66,7 @@ module ProjectHttpHandlers =
                          GitRepoLink = project.GitRepoLink
                          TasksLink = project.TasksLink
                          LogoLink = project.LogoLink
+                         CreatorId = project.CreatorId
                          Tags = project.ProjectTags.Select(fun pt -> {
                             TagResponses.ProjectView.Id = pt.Tag.Id
                             TagResponses.ProjectView.Value = pt.Tag.Value
@@ -102,6 +103,7 @@ module ProjectHttpHandlers =
                 | true ->
                     return! RequestErrors.BAD_REQUEST "project exists" next ctx
                 | false ->
+                    let participation = new ResizeArray<Participation>()
                     let project = {
                         Id = Guid.NewGuid()
                         Name = model.Name
@@ -111,10 +113,21 @@ module ProjectHttpHandlers =
                         GitRepoLink = model.GitRepoLink
                         TasksLink = model.TasksLink
                         LogoLink = model.LogoLink
+                        CreatorId = UserId ctx
                         ProjectTags = new ResizeArray<ProjectTag>()
-                        Participations = new ResizeArray<Participation>()
+                        Participations = participation
                     }
-
+                    let! ownerRole = db.ProjectRoles.FindAsync(PredefinedDatabaseValues.OwnerRoleId)
+                    participation.Add ({
+                        Participation.Id = Guid.NewGuid()
+                        Participation.Project = project
+                        Participation.ProjectId = project.Id
+                        Participation.UserId = UserId ctx
+                        Participation.ProjectRoleId = PredefinedDatabaseValues.OwnerRoleId
+                        Participation.ProjectRole = ownerRole
+                        Participation.From = DateTime.UtcNow
+                        Participation.To = None
+                    })
                     db.Projects.Add(project) |> ignore
                     let! save = db.SaveChangesAsync()
                     return! json project next ctx
