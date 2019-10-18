@@ -50,7 +50,7 @@ jobs:
     inputs:
       command: publish
       publishWebProjects: false
-      projects: ITLab.Projects/ITLab.Projects.csproj
+      projects: src/ITLab.Projects/ITLab.Projects.fsproj
       arguments: -o $(Build.ArtifactStagingDirectory) --no-restore
       zipAfterPublish: false
       modifyOutputPath: false
