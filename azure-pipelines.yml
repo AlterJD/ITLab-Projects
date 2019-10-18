@@ -39,14 +39,18 @@ jobs:
       command: test
       projects: tests/**/*.fsproj
       arguments: --no-restore
-
+  - task: DeleteFiles@1
+    displayName: delete publish folder
+    inputs:
+      SourceFolder: '$(Build.ArtifactStagingDirectory)'
+      Contents: '**' 
   - task: DotNetCoreCLI@2
     displayName: dotnet publish
     inputs:
       command: publish
       publishWebProjects: false
       projects: 
-      arguments: -o $(Build.ArtifactStagingDirectory) --no-restore
+      arguments: -o --no-restore
       zipAfterPublish: false
       modifyOutputPath: false
 
