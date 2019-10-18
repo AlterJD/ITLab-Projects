@@ -6,6 +6,7 @@ COPY ./src/ITLab.Projects/ITLab.Projects.fsproj ./src/ITLab.Projects/
 COPY ./src/ITLab.Projects.Database/ITLab.Projects.Database.csproj ./src/ITLab.Projects.Database/
 COPY ./src/ITLab.Projects.Models/ITLab.Projects.Models.fsproj ./src/ITLab.Projects.Models/
 COPY ./src/ITLab.Projects.PublicAPI/ITLab.Projects.PublicAPI.fsproj ./src/ITLab.Projects.PublicAPI/
+COPY ./src/ITLab.Projects.Stuff/ITLab.Projects.Stuff.fsproj ./src/ITLab.Projects.Stuff/
 
 COPY ./tests/ITLab.Projects.Tests/ITLab.Projects.Tests.fsproj ./tests/ITLab.Projects.Tests/
 
