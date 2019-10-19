@@ -11,7 +11,7 @@ master | develop | tests
 
 ## Prerequriments
 
-* Net Core 3
+* Net Core 3.1
 * PostgreSQL
 
 ## Configuration
@@ -41,9 +41,10 @@ master | develop | tests
     "ConnectionStrings": {
         "Postgres": "CONNECTION STRING"
     },
-	"JWT" : {
-		"Authority": "URL of identity server"
-	}
+    "JWT" : {
+        "DebugKey": "123456789010111213",
+        "Authority": "URL of identity server"
+    }
 }
 ```
 
@@ -54,11 +55,13 @@ master | develop | tests
 
 **FILL_DEBUG_DB** ( true | false ) - fill database with default values
 
-**TESTS** ( true | false ) - if true: acess token not required
+**TESTS** ( true | false ) - if true: acess token writes in first line of console output, use it for authorize
 
 **AUTHORIZATION**
 
-Section JWT store all data for authorize users. Application require scope ```itlab.projects```.
+Section **JWT** store all data for authorize users. Application require scope ```itlab.projects```.
+* **DebugKey** - uses when TESTS in true state, key for signing access token
+* **Authority** - uses when TESTS in false state, authority for validating production jwt token
 
 ## Run
 ```bash
@@ -67,4 +70,30 @@ dotnet run
 ```
 API will be available on [localhost:54052](http://localhost:54052)
 
-<!-- TODO: run tests -->
+## Tests
+
+### Unit tests (not yet available)
+
+To run unit tests in root folder invoke next command:
+
+```shell
+dotnet test tests/ITLab.Projects.Tests/ITLab.projects.Tests.fsproj
+```
+
+### Integration tests
+
+#### Prerequriments
+
+* Docker compose
+To run integration tests run follow commands in folder ```tests/docker```
+
+```shell
+docker-compose build
+docker-compose up -d web-app
+docker-compose up testmace
+docker-compose rm -s -f
+```
+
+Test results will be displayed in console output, and saved to xml file in JUnit format
+
+Integration tests uses [Testmace](https://testmace.com/) for testing API.
