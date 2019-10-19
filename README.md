@@ -1,4 +1,4 @@
-# Projects service for RTUITLab
+# Project service for RTUITLab
 
 master | develop | tests
 --- | --- | ---
@@ -9,7 +9,7 @@ master | develop | tests
 [build-dev-image]: https://dev.azure.com/rtuitlab/RTU%20IT%20Lab/_apis/build/status/ITLab-Projects?branchName=develop
 [build-dev-link]: https://dev.azure.com/rtuitlab/RTU%20IT%20Lab/_build/latest?definitionId=66&branchName=develop
 
-## Prerequriments
+## Requriments
 
 * Net Core 3.1
 * PostgreSQL
@@ -18,7 +18,7 @@ master | develop | tests
 
 ### Database project
 
-```appsettings.Secret.json``` must be placed to the ```src/ITLab.Projects.Database/``` folder
+```appsettings.Secret.json``` must be placed to  ```src/ITLab.Projects.Database/``` folder
 
 ```json
 {
@@ -30,7 +30,7 @@ master | develop | tests
 
 ### Main project
 
-```appsettings.Secret.json``` must be placed to the ```src/ITLab.Projects/``` folder
+```appsettings.Secret.json``` must be placed to  ```src/ITLab.Projects/``` folder
 
 
 ```json
@@ -50,16 +50,16 @@ master | develop | tests
 
 **DB_TYPE** - type of the database which will be used. Possible types:
 
-* **IN_MEMORY** - to use in memory database for debug or first start
+* **IN_MEMORY** - to use in memory database for debug or startup
 * **POSTGRES** - to use PostgreSQL database with connection string from ```ConnectionStrings:Postgres```
 
 **FILL_DEBUG_DB** ( true | false ) - fill database with default values
 
-**TESTS** ( true | false ) - if true: acess token writes in first line of console output, use it for authorize
+**TESTS** ( true | false ) - if true: acess token is written in the first line of console output, use it for authorization
 
 **AUTHORIZATION**
 
-Section **JWT** store all data for authorize users. Application require scope ```itlab.projects```.
+Section **JWT** stores all data of authorized users. Application require scope ```itlab.projects```.
 * **DebugKey** - uses when TESTS in true state, key for signing access token
 * **Authority** - uses when TESTS in false state, authority for validating production jwt token
 
@@ -74,7 +74,7 @@ API will be available on [localhost:54052](http://localhost:54052)
 
 ### Unit tests (not yet available)
 
-To run unit tests in root folder invoke next command:
+To run unit tests in root folder invoke:
 
 ```shell
 dotnet test tests/ITLab.Projects.Tests/ITLab.projects.Tests.fsproj
@@ -85,7 +85,7 @@ dotnet test tests/ITLab.Projects.Tests/ITLab.projects.Tests.fsproj
 #### Prerequriments
 
 * Docker compose
-To run integration tests run follow commands in folder ```tests/docker```
+To run integration tests invoke the following commands in folder ```tests/docker```
 
 ```shell
 docker-compose build
@@ -96,4 +96,4 @@ docker-compose rm -s -f
 
 Test results will be displayed in console output, and saved to xml file in JUnit format
 
-Integration tests uses [Testmace](https://testmace.com/) for testing API.
+Integration tests use [Testmace](https://testmace.com/) for testing API.
