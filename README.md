@@ -82,7 +82,7 @@ dotnet test tests/ITLab.Projects.Tests/ITLab.projects.Tests.fsproj
 
 ### Integration tests
 
-#### Prerequriments
+#### Requriments
 
 * Docker compose
 To run integration tests invoke the following commands in folder ```tests/docker```
