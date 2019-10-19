@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="JWT.fs" />
     <Compile Include="Stuff.fs" />
     <Compile Include="Database\PredefinedDatabaseValues.fs" />
     <Compile Include="DebugDataBaseCreate.fs" />

@@ -118,11 +118,24 @@ type CustomNegotiationConfig (baseConfig : INegotiationConfig) =
 
 exception InvalidDbType of string
 
-let configureJwt (configuration: IConfiguration) (options: JwtBearerOptions) =
-    options.Authority <- configuration.GetValue<string> "JWT:Authority"
-    options.RequireHttpsMetadata <- false
-    options.TokenValidationParameters.ValidateLifetime <- not (configuration.GetValue<bool>("TESTS"))
-    options.Audience <- "itlab.projects"
+let configureJwt isDebug (configuration: IConfiguration) =
+    match isDebug with
+    | true ->
+        let token =  JWT.debugJwtToken configuration
+        printfn "DEBUG TOKEN IS: %s" token
+        fun  (options: JwtBearerOptions) ->
+            options.RequireHttpsMetadata <- false
+            options.TokenValidationParameters.IssuerSigningKey <- JWT.issuerSigningKey configuration
+            options.TokenValidationParameters.ValidateLifetime <- false
+            options.TokenValidationParameters.ValidateAudience <- false
+            options.TokenValidationParameters.ValidateIssuer <- false
+            options.Audience <- "itlab.projects"
+    | false -> 
+        fun (options: JwtBearerOptions) ->
+            options.Authority <- configuration.GetValue<string> "JWT:Authority"
+            options.RequireHttpsMetadata <- false
+            options.TokenValidationParameters.ValidateLifetime <- true
+            options.Audience <- "itlab.projects"
 
 let configureServices (configuration: IConfiguration) (services : IServiceCollection) =
     match configuration.GetValue<string> "DB_TYPE"  with
@@ -159,8 +172,10 @@ let configureServices (configuration: IConfiguration) (services : IServiceCollec
 
     services.AddSingleton<IJsonSerializer>(
         NewtonsoftJsonSerializer(customSettings)) |> ignore
+    let isTests = configuration.GetValue<bool>("TESTS")
+    let jwtAction = configureJwt isTests configuration
     services.AddAuthentication("Bearer")
-        .AddJwtBearer("Bearer", Action<JwtBearerOptions> (configureJwt configuration) ) |> ignore
+        .AddJwtBearer("Bearer", Action<JwtBearerOptions> jwtAction  ) |> ignore
 
 
 let configureLogging (builder : ILoggingBuilder) =
